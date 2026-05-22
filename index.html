@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Luna & Letters"/>
+<meta name="theme-color" content="#0d0221"/>
+<title>Luna & Letters ✨</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>"/>
+<link rel="apple-touch-icon" href="Luna_AI_assistant.png"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0221;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(80px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(0.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes achBounce{0%{transform:translateX(-50%) scale(0.4) translateY(120px);opacity:0}55%{transform:translateX(-50%) scale(1.12) translateY(-8px);opacity:1}75%{transform:translateX(-50%) scale(0.96) translateY(0)}100%{transform:translateX(-50%) scale(1) translateY(0);opacity:1}}
+@keyframes iconSpin{0%{transform:scale(0) rotate(-180deg)}60%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0deg)}}
+@keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+@keyframes screenFlash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+<script type="text/babel">
+const{useState,useEffect,useRef}=React;
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+const CRYSTALS=[
+  {name:"Lapis Lazuli",it:"Lapislazzuli",emoji:"💙",lunar:"Lascia il lapislazzuli sotto la luna piena per 8 ore per ricaricare la sua energia di saggezza e verità.",lunarEn:"Leave lapis lazuli under the full moon for 8 hours to recharge its wisdom and truth energy.",words:[{en:"moonlight",it:"luce della luna",ex:"The moonlight is beautiful tonight."},{en:"wisdom",it:"saggezza",ex:"Lapis gives wisdom to the mind."},{en:"peace",it:"pace",ex:"I feel peace when I hold this crystal."},{en:"healing",it:"guarigione",ex:"Crystals have healing power."},{en:"truth",it:"verità",ex:"Lapis reveals the truth."}]},
+  {name:"Topaz",it:"Topazio",emoji:"✨",lunar:"Il topazio si carica con la luna crescente — mettilo sul davanzale quando la luna inizia a crescere.",lunarEn:"Topaz charges with the waxing moon — put it on the windowsill as the moon starts to grow.",words:[{en:"strength",it:"forza",ex:"Topaz gives you inner strength."},{en:"clarity",it:"chiarezza",ex:"Find clarity with this stone."},{en:"energy",it:"energia",ex:"Feel the energy of topaz."},{en:"joy",it:"gioia",ex:"Topaz brings joy to your heart."},{en:"bright",it:"luminoso",ex:"The stone is very bright."}]},
+  {name:"Amethyst",it:"Ametista",emoji:"💜",lunar:"L'ametista assorbe l'energia della luna calante. Meditaci sopra di notte per purificare i sogni.",lunarEn:"Amethyst absorbs waning moon energy. Meditate with it at night to purify your dreams.",words:[{en:"calm",it:"calma",ex:"Amethyst brings calm to the room."},{en:"dream",it:"sogno",ex:"Place it by your bed for good dreams."},{en:"balance",it:"equilibrio",ex:"Find your balance every day."},{en:"protect",it:"proteggere",ex:"This crystal protects your energy."},{en:"spiritual",it:"spirituale",ex:"This is a very spiritual stone."}]},
+  {name:"Rose Quartz",it:"Quarzo Rosa",emoji:"🌸",lunar:"Il quarzo rosa si potenzia sotto la luna in Bilancia o Toro — attira l'amore e l'armonia.",lunarEn:"Rose quartz amplifies under the Libra or Taurus moon — it attracts love and harmony.",words:[{en:"love",it:"amore",ex:"Rose quartz attracts love."},{en:"gentle",it:"gentile",ex:"The energy is very gentle."},{en:"heart",it:"cuore",ex:"It opens your heart."},{en:"harmony",it:"armonia",ex:"Feel the harmony around you."},{en:"kindness",it:"gentilezza",ex:"Kindness is a superpower."}]},
+  {name:"Moonstone",it:"Pietra di Luna",emoji:"🌙",lunar:"La pietra di luna è MAGICA durante la luna piena. Portala sempre con te quella notte speciale!",lunarEn:"Moonstone is MAGICAL during the full moon. Always carry it with you on that special night!",words:[{en:"intuition",it:"intuizione",ex:"Trust your intuition always."},{en:"cycle",it:"ciclo",ex:"The moon has a monthly cycle."},{en:"mystery",it:"mistero",ex:"The stone is full of mystery."},{en:"glow",it:"bagliore",ex:"Look at that beautiful glow!"},{en:"inner",it:"interiore",ex:"Find your inner light."}]},
+  {name:"Citrine",it:"Citrino",emoji:"🌟",lunar:"Il citrino si carica con la luna nuova — è il momento perfetto per fissare nuove intenzioni di prosperità.",lunarEn:"Citrine charges with the new moon — the perfect time to set new intentions of prosperity.",words:[{en:"abundance",it:"abbondanza",ex:"Citrine attracts abundance."},{en:"prosperity",it:"prosperità",ex:"Feel the energy of prosperity."},{en:"sunny",it:"soleggiato",ex:"Citrine has a sunny warm energy."},{en:"manifest",it:"manifestare",ex:"Manifest your dreams right now."},{en:"positive",it:"positivo",ex:"Stay positive every single day."}]},
+  {name:"Obsidian",it:"Ossidiana",emoji:"🖤",lunar:"L'ossidiana assorbe le energie negative durante la luna calante. Puliscila spesso sotto l'acqua corrente.",lunarEn:"Obsidian absorbs negative energies during the waning moon. Clean it often under running water.",words:[{en:"shadow",it:"ombra",ex:"Face your shadow with courage."},{en:"release",it:"lasciar andare",ex:"Release what no longer serves you."},{en:"grounding",it:"radicamento",ex:"Obsidian is deeply grounding."},{en:"volcanic",it:"vulcanico",ex:"Obsidian is natural volcanic glass."},{en:"shield",it:"scudo",ex:"It acts as a protective shield."}]},
+  {name:"Tiger's Eye",it:"Occhio di Tigre",emoji:"🐯",lunar:"L'occhio di tigre si potenzia con la luna crescente — porta coraggio nei momenti più difficili.",lunarEn:"Tiger's eye amplifies with the waxing moon — it brings courage in the hardest moments.",words:[{en:"courage",it:"coraggio",ex:"Have the courage to be yourself."},{en:"focus",it:"concentrazione",ex:"Tiger's eye improves your focus."},{en:"bold",it:"audace",ex:"Be bold and fearless today."},{en:"fierce",it:"intenso",ex:"She has such a fierce energy."},{en:"determined",it:"determinato",ex:"Stay determined no matter what."}]},
+  {name:"Selenite",it:"Selenite",emoji:"🤍",lunar:"La selenite è l'unica pietra che non ha bisogno di essere caricata — contiene già la luce della luna.",lunarEn:"Selenite is the only stone that doesn't need charging — it already contains moonlight within itself.",words:[{en:"pure",it:"puro",ex:"Selenite has a pure white energy."},{en:"cleanse",it:"purificare",ex:"Use selenite to cleanse your space."},{en:"angelic",it:"angelico",ex:"It carries an angelic vibration."},{en:"serene",it:"sereno",ex:"The energy is calm and serene."},{en:"divine",it:"divino",ex:"Feel the divine light within you."}]},
+  {name:"Labradorite",it:"Labradorite",emoji:"🦋",lunar:"La labradorite brilla come la luna — mostra colori diversi a seconda della luce, come le nostre emozioni.",lunarEn:"Labradorite shines like the moon — it shows different colors depending on the light, just like our emotions.",words:[{en:"transform",it:"trasformare",ex:"She began to transform herself."},{en:"magical",it:"magico",ex:"Labradorite has a magical glow."},{en:"iridescent",it:"iridescente",ex:"The stone is iridescent and stunning."},{en:"awaken",it:"risvegliare",ex:"Awaken your true inner potential."},{en:"beyond",it:"oltre",ex:"Look beyond what you can see."}]},
+];
+
+const ZODIAC=[
+  {sign:"Aries",it:"Ariete",emoji:"♈",dates:"21 Mar – 19 Apr",traits:["brave","energetic","bold","leader","passionate"],itTraits:["coraggioso","energico","audace","leader","appassionato"],element:"Fuoco 🔥",crystal:"Red Jasper 🔴",tip:"Say 'I am brave' every morning!",deep:"L'Ariete è il primo segno dello zodiaco — pieno di energia e voglia di iniziare nuove cose. Non ha paura di niente e va sempre avanti.",deepEn:"Aries is the first sign — full of energy and desire to start new things. It fears nothing and always moves forward."},
+  {sign:"Taurus",it:"Toro",emoji:"♉",dates:"20 Apr – 20 May",traits:["loyal","patient","strong","sensual","reliable"],itTraits:["leale","paziente","forte","sensuale","affidabile"],element:"Terra 🌍",crystal:"Rose Quartz 🌸",tip:"Your English word: 'steadfast' = saldo, fedele.",deep:"Il Toro ama il bello, il comfort e la stabilità. È il segno più sensuale dello zodiaco.",deepEn:"Taurus loves beauty, comfort and stability. It's the most sensual sign of the zodiac."},
+  {sign:"Gemini",it:"Gemelli",emoji:"♊",dates:"21 May – 20 Jun",traits:["curious","clever","social","fun","adaptable"],itTraits:["curioso","intelligente","sociale","divertente","adattabile"],element:"Aria 💨",crystal:"Citrine 💛",tip:"Gemini loves to talk — perfect for learning English!",deep:"I Gemelli hanno due anime — sociali e riservati allo stesso tempo. Adorano imparare cose nuove.",deepEn:"Gemini has two souls — social and reserved at the same time. They love learning new things."},
+  {sign:"Cancer",it:"Cancro",emoji:"♋",dates:"21 Jun – 22 Jul",traits:["caring","sensitive","intuitive","nurturing","creative"],itTraits:["premuroso","sensibile","intuitivo","materno","creativo"],element:"Acqua 💧",crystal:"Moonstone 🌙",tip:"Your power word: 'nurture' = prendersi cura.",deep:"Il Cancro è governato dalla Luna — profondo e intuitivo. Ha un'enorme capacità di amare e proteggere.",deepEn:"Cancer is ruled by the Moon — deep and intuitive. It has an enormous capacity to love and protect."},
+  {sign:"Leo",it:"Leone",emoji:"♌",dates:"23 Jul – 22 Aug",traits:["confident","creative","warm","royal","generous"],itTraits:["sicuro","creativo","caldo","regale","generoso"],element:"Fuoco 🔥",crystal:"Sunstone ☀️",tip:"Say 'I am radiant' — it means raggiante!",deep:"Il Leone ama brillare e far sentire speciali le persone che ama. Ha un cuore grandissimo.",deepEn:"Leo loves to shine and make people it loves feel special. It has a huge heart."},
+  {sign:"Virgo",it:"Vergine",emoji:"♍",dates:"23 Aug – 22 Sep",traits:["smart","helpful","careful","gentle","precise"],itTraits:["intelligente","utile","attento","gentile","preciso"],element:"Terra 🌍",crystal:"Amazonite 💚",tip:"Your word: 'meticulous' = meticoloso. Very Virgo!",deep:"La Vergine vede i dettagli che gli altri non notano. Si sente bene quando aiuta e migliora le cose.",deepEn:"Virgo sees details others miss. It feels good when it helps and improves things."},
+  {sign:"Libra",it:"Bilancia",emoji:"♎",dates:"23 Sep – 22 Oct",traits:["fair","peaceful","charming","balanced","elegant"],itTraits:["giusto","pacifico","affascinante","equilibrato","elegante"],element:"Aria 💨",crystal:"Lapis Lazuli 💙",tip:"'Aesthetic' is your English word — you know it!",deep:"La Bilancia è governata da Venere — ama la bellezza, l'armonia e le relazioni.",deepEn:"Libra is ruled by Venus — it loves beauty, harmony and relationships."},
+  {sign:"Scorpio",it:"Scorpione",emoji:"♏",dates:"23 Oct – 21 Nov",traits:["intense","passionate","deep","powerful","loyal"],itTraits:["intenso","appassionato","profondo","potente","leale"],element:"Acqua 💧",crystal:"Obsidian 🖤",tip:"Your word: 'magnetic' = magnetico. Very Scorpio!",deep:"Lo Scorpione è il segno della trasformazione — muore e rinasce come la fenice.",deepEn:"Scorpio is the sign of transformation — it dies and is reborn like a phoenix."},
+  {sign:"Sagittarius",it:"Sagittario",emoji:"♐",dates:"22 Nov – 21 Dec",
+   traits:["free","adventurous","honest","wise","optimistic","curious","funny","generous"],
+   itTraits:["libero","avventuroso","onesto","saggio","ottimista","curioso","divertente","generoso"],
+   element:"Fuoco 🔥",crystal:"Turquoise 🩵",tip:"'Wanderlust' = voglia di viaggiare. La parola più Sagittario!",
+   isEmanuela:true,
+   planet:"Giove (Jupiter) 🪐 — il pianeta della fortuna e dell'espansione!",planetEn:"Jupiter 🪐 — the planet of luck and expansion!",
+   deep:"Il Sagittario è il filosofo e l'avventuriero dello zodiaco. Ama la libertà sopra ogni cosa — non sopporta le catene. È brutalmente onesto e dice sempre quello che pensa. Ama viaggiare, imparare lingue nuove e scoprire culture diverse. Giove gli porta fortuna naturale!",
+   deepEn:"Sagittarius is the philosopher and adventurer of the zodiac. It loves freedom above all. It's brutally honest and always says what it thinks. It loves traveling, learning new languages and discovering different cultures. Jupiter brings natural luck!",
+   compatible:["Ariete ♈","Leone ♌","Acquario ♒","Bilancia ♎"],
+   celebrities:["Taylor Swift 🎵","Miley Cyrus 🎤","Billie Eilish 🖤","Brad Pitt 🎬","Nicki Minaj 👑"],
+   shadowTraits:["impatient","restless","blunt","commitment-phobic"],shadowIt:["impaziente","irrequieto","brusco","evita gli impegni"],
+   powerWord:"'Expansive' = espansivo. La parola perfetta per l'energia del Sagittario — sempre più grande, sempre più lontano!",
+  },
+  {sign:"Capricorn",it:"Capricorno",emoji:"♑",dates:"22 Dec – 19 Jan",traits:["responsible","ambitious","wise","disciplined","patient"],itTraits:["responsabile","ambizioso","saggio","disciplinato","paziente"],element:"Terra 🌍",crystal:"Garnet ❤️",tip:"'Resilient' = resiliente. Your superpower!",deep:"Il Capricorno scala la montagna della vita con pazienza e determinazione. Non si ferma mai.",deepEn:"Capricorn climbs the mountain of life with patience and determination. It never stops."},
+  {sign:"Aquarius",it:"Acquario",emoji:"♒",dates:"20 Jan – 18 Feb",traits:["unique","open-minded","kind","original","visionary"],itTraits:["unico","aperto","gentile","originale","visionario"],element:"Aria 💨",crystal:"Amethyst 💜",tip:"'Revolutionary' — that's your energy!",deep:"L'Acquario è il segno del futuro — pensa in modo originale e vuole cambiare il mondo.",deepEn:"Aquarius is the sign of the future — it thinks originally and wants to change the world."},
+  {sign:"Pisces",it:"Pesci",emoji:"♓",dates:"19 Feb – 20 Mar",traits:["dreamy","artistic","kind","spiritual","empathetic"],itTraits:["sognante","artistico","gentile","spirituale","empatico"],element:"Acqua 💧",crystal:"Aquamarine 🩵",tip:"'Ethereal' = etereo. The most Pisces word ever.",deep:"I Pesci vivono tra realtà e sogno. Sono i più empatici dello zodiaco.",deepEn:"Pisces lives between reality and dream. They are the most empathetic of the zodiac."},
+];
+
+const FACTS=[
+  {emoji:"🍋",title:"Limone & Spaghetti",titleEn:"Lemon & Spaghetti",fact:"Sapevi che 'zesty' significa piena di sapore e vivacità? Si usa spesso per i piatti col limone! E 'squeeze' vuol dire strizzare — esattamente quello che si fa col limone sulla pasta.",factEn:"'Zesty' means full of flavor and liveliness — often used for lemon dishes. 'Squeeze' means strizzare — exactly what you do with a lemon on pasta!",words:[{en:"lemon",it:"limone",ex:"This pasta has fresh lemon!"},{en:"zesty",it:"saporito / vivace",ex:"This dish is incredibly zesty."},{en:"squeeze",it:"strizzare",ex:"Squeeze the lemon over the pasta."},{en:"recipe",it:"ricetta",ex:"Can you share your recipe?"},{en:"delicious",it:"delizioso",ex:"This is absolutely delicious!"}]},
+  {emoji:"🌊",title:"La Spiaggia",titleEn:"The Beach",fact:"'Shore' e 'coast' sono sinonimi di riva/costa. 'Beach' è la parte sabbiosa. 'Tide' è la marea — 'high tide' è alta marea, 'low tide' è bassa marea. 'Driftwood' è il legno trascinato dal mare.",factEn:"'Shore' and 'coast' both mean riva/costa. 'Beach' is the sandy part. 'Tide' is marea — 'high tide' is alta marea, 'low tide' is bassa marea.",words:[{en:"wave",it:"onda",ex:"Look at that enormous wave!"},{en:"shore",it:"riva",ex:"Let's walk along the shore."},{en:"tide",it:"marea",ex:"The tide is coming in."},{en:"sunset",it:"tramonto",ex:"The sunset is pink and stunning."},{en:"seashell",it:"conchiglia",ex:"I found a beautiful seashell today."}]},
+  {emoji:"🪢",title:"Le Treccine",titleEn:"Box Braids",fact:"Le box braids hanno più di 5000 anni di storia in Africa! 'Braids' sono le trecce, 'protective style' è un'acconciatura che protegge i capelli. Guardare le trecce intrecciarsi ha un effetto meditativo.",factEn:"Box braids have over 5000 years of history in Africa! 'Braids' = trecce, 'protective style' = a hairstyle that protects hair. Watching the weaving pattern has a meditative effect.",words:[{en:"braids",it:"treccine",ex:"Your braids look absolutely amazing!"},{en:"weave",it:"intrecciare",ex:"She can weave hair so beautifully."},{en:"protective",it:"protettivo",ex:"It's a very protective style."},{en:"cultural",it:"culturale",ex:"It's a deep cultural tradition."},{en:"elegant",it:"elegante",ex:"So elegant and timeless!"}]},
+  {emoji:"🧘",title:"Pilates in Inglese",titleEn:"Pilates in English",fact:"Il pilates è stato inventato da Joseph Pilates negli anni '20 in Germania! Le istruzioni nelle classi sono quasi sempre in inglese. La parola più importante? 'Core' — il centro del corpo. Senza core non si fa pilates!",factEn:"Pilates was invented by Joseph Pilates in the 1920s in Germany! Class instructions are almost always in English. The most important word? 'Core' — the body's center. No core, no pilates!",words:[{en:"breathe",it:"respirare",ex:"Breathe in slowly and deeply."},{en:"core",it:"addominali / centro",ex:"Engage your core right now!"},{en:"lengthen",it:"allungare",ex:"Lengthen your spine up tall."},{en:"posture",it:"postura",ex:"Your posture looks perfect!"},{en:"flow",it:"fluidità",ex:"Move with flow and grace."}]},
+  {emoji:"🏋️",title:"Attrezzatura Pilates",titleEn:"Pilates Equipment",fact:"Il pilates non è solo tappetino! Il 'reformer' è la macchina più famosa — un lettino con molle e cinghie. Il 'magic circle' o 'ring' si tiene tra le ginocchia o le braccia per creare resistenza. Conoscere questi nomi ti aiuta con i video YouTube!",factEn:"Pilates is not just a mat! The 'reformer' is the most famous machine — a bed with springs and straps. The 'magic circle' or 'ring' is held between knees or arms for resistance. Knowing these names helps with YouTube videos!",words:[{en:"reformer",it:"reformer (macchina pilates)",ex:"The reformer class was amazing!"},{en:"resistance",it:"resistenza",ex:"Increase the resistance slowly."},{en:"neutral spine",it:"colonna in posizione neutra",ex:"Keep a neutral spine always."},{en:"alignment",it:"allineamento",ex:"Check your body alignment."},{en:"controlled",it:"controllato",ex:"Every movement must be controlled."}]},
+  {emoji:"🧠",title:"Psicologia",titleEn:"Psychology",fact:"La psicologia usa tantissime parole inglesi che sentiamo ogni giorno! 'Boundaries' (confini personali) è forse la più importante — saper dire no è fondamentale. 'Gaslighting', 'toxic', 'trigger' — tutte dall'inglese!",factEn:"Psychology uses many English words we hear daily! 'Boundaries' is perhaps the most important — knowing how to say no is essential. 'Gaslighting', 'toxic', 'trigger' — all from English!",words:[{en:"anxiety",it:"ansia",ex:"I sometimes feel anxiety."},{en:"boundary",it:"confine / limite",ex:"I need to set my boundaries."},{en:"resilience",it:"resilienza",ex:"She has incredible resilience."},{en:"healing",it:"guarigione / cura di sé",ex:"I am healing every single day."},{en:"empathy",it:"empatia",ex:"She shows so much empathy."}]},
+  {emoji:"🔗",title:"Stili di Attaccamento",titleEn:"Attachment Styles",fact:"La teoria degli stili di attaccamento è fondamentale in psicologia! 'Secure' (sicuro) è il tipo sano. 'Anxious' è quando hai paura di perdere le persone. 'Avoidant' è quando tendi a chiuderti. Questi termini si usano tantissimo nei libri di self-help in inglese!",factEn:"Attachment styles theory is fundamental in psychology! 'Secure' is the healthy type. 'Anxious' is fearing losing loved ones. 'Avoidant' is when you tend to close yourself off. These terms are used a lot in English self-help books!",words:[{en:"secure",it:"sicuro / stabile",ex:"She has a secure attachment style."},{en:"anxious",it:"ansioso",ex:"I feel anxious when you don't reply."},{en:"avoidant",it:"evitante",ex:"He has an avoidant personality."},{en:"attachment",it:"attaccamento",ex:"Attachment styles form in childhood."},{en:"trust",it:"fiducia",ex:"Trust is the base of everything."}]},
+  {emoji:"💕",title:"Romanzi Rosa",titleEn:"Romance Novels",fact:"I romanzi rosa sono il genere più venduto al mondo in inglese! La parola 'longing' non ha traduzione esatta: è un misto di desiderio, nostalgia e attesa. E 'swoon' — cedere per qualcuno di bello — è la reazione tipica del romance!",factEn:"Romance novels are the best-selling genre in English! 'Longing' has no exact Italian translation: a mix of desire, nostalgia and waiting. And 'swoon' — to faint from beauty — is the typical romance reaction!",words:[{en:"longing",it:"desiderio / nostalgia",ex:"She felt a deep longing for him."},{en:"tender",it:"tenero",ex:"His voice was so tender and warm."},{en:"whisper",it:"sussurrare",ex:"He whispered her name softly."},{en:"heartbeat",it:"battito del cuore",ex:"Her heartbeat was racing fast."},{en:"beloved",it:"amato / a",ex:"You are my beloved, always."}]},
+  {emoji:"📚",title:"Nicholas Sparks",titleEn:"Nicholas Sparks",fact:"Nicholas Sparks è il re del romanzo rosa americano! 'The Notebook' (Le pagine della nostra vita) e 'A Walk to Remember' sono i suoi capolavori. La sua parola chiave? 'Devoted' — essere completamente dedicati a qualcuno per tutta la vita.",factEn:"Nicholas Sparks is the king of American romance! 'The Notebook' and 'A Walk to Remember' are his masterpieces. His keyword? 'Devoted' — being completely dedicated to someone for your whole life.",words:[{en:"devoted",it:"devoto / dedicato",ex:"He was devoted to her forever."},{en:"cherish",it:"custodire / tenere caro",ex:"I cherish every moment with you."},{en:"soulmate",it:"anima gemella",ex:"I think you are my soulmate."},{en:"timeless",it:"senza tempo / eterno",ex:"Their love was timeless."},{en:"promise",it:"promessa",ex:"Keep your promise, always."}]},
+  {emoji:"📖",title:"Colleen Hoover",titleEn:"Colleen Hoover",fact:"Colleen Hoover — chiamata 'CoHo' dai fan — è la regina del romance moderno! 'It Ends With Us', 'Ugly Love', 'November 9' — tutti bestseller mondiali. I suoi libri parlano di donne forti, amori complicati e crescita personale.",factEn:"Colleen Hoover — called 'CoHo' by fans — is the queen of modern romance! 'It Ends With Us', 'Ugly Love', 'November 9' — all worldwide bestsellers. Her books deal with strong women, complicated loves and personal growth.",words:[{en:"vulnerable",it:"vulnerabile",ex:"Being vulnerable takes real courage."},{en:"deserve",it:"meritare",ex:"You deserve so much better."},{en:"brave",it:"coraggioso",ex:"She was brave enough to leave."},{en:"overcome",it:"superare",ex:"She overcame everything alone."},{en:"worthy",it:"degno / che merita",ex:"You are worthy of great love."}]},
+  {emoji:"💙",title:"I Tuoi Colori: Blu & Rosa",titleEn:"Your Colors: Blue & Pink",fact:"Il blu ha tantissime sfumature! 'Navy' è il blu scuro, 'sky blue' è il celeste, 'cobalt' è intenso, 'teal' è azzurro-verde. Il rosa va da 'blush' (quasi bianco) a 'fuchsia' a 'hot pink'. Il mare al tramonto le ha tutte!",factEn:"Blue has so many shades! 'Navy' is dark blue, 'sky blue' is celeste, 'cobalt' is intense blue, 'teal' is blue-green. Pink goes from 'blush' to 'fuchsia' to 'hot pink'. The sea at sunset has them all!",words:[{en:"navy",it:"blu marino",ex:"She wore a beautiful navy dress."},{en:"blush",it:"rosa pallido",ex:"The sky turned blush at sunset."},{en:"cobalt",it:"blu cobalto",ex:"Cobalt is a rich deep blue."},{en:"teal",it:"azzurro-verde",ex:"The sea was a perfect teal color."},{en:"fuchsia",it:"fucsia",ex:"I love her fuchsia scarf!"}]},
+  {emoji:"🌙",title:"Il Vocabolario della Luna",titleEn:"The Language of the Moon",fact:"La luna ha un vocabolario tutto suo! 'Waxing' = la luna cresce, 'waning' = diminuisce. 'Crescent' è la luna a falce. E sai che 'lunatic' — pazzo — viene proprio da 'luna'? I romani credevano che la luna piena rendesse le persone pazze!",factEn:"The moon has its own vocabulary! 'Waxing' = the moon grows, 'waning' = it shrinks. 'Crescent' is the crescent moon. Did you know 'lunatic' comes from 'luna'? Romans believed the full moon made people crazy!",words:[{en:"waxing",it:"crescente",ex:"The waxing moon brings new energy."},{en:"waning",it:"calante",ex:"The waning moon is for releasing."},{en:"crescent",it:"falce / mezzaluna",ex:"The crescent moon is so romantic."},{en:"full moon",it:"luna piena",ex:"Tonight is a magical full moon!"},{en:"lunar",it:"lunare",ex:"The lunar cycle lasts 28 days."}]},
+  {emoji:"☕",title:"Caffè & Colazione",titleEn:"Coffee & Breakfast",fact:"L'italiano ha conquistato il mondo del caffè! 'Espresso', 'cappuccino', 'latte' sono parole italiane usate ovunque. Ma in America ordinare un 'latte' significa solo latte caldo! Devi sempre dire 'coffee latte'.",factEn:"Italian conquered the coffee world! But in America ordering a 'latte' means just warm milk! You always have to say 'coffee latte'.",words:[{en:"sip",it:"sorso / sorseggiare",ex:"I love to sip my morning coffee."},{en:"brew",it:"preparare",ex:"I brew fresh coffee every morning."},{en:"cozy",it:"accogliente",ex:"This café feels so cozy!"},{en:"aroma",it:"aroma / profumo",ex:"The aroma of coffee is amazing."},{en:"morning routine",it:"routine mattutina",ex:"Coffee is my morning routine."}]},
+  {emoji:"💪",title:"Il Corpo per il Pilates",titleEn:"The Body for Pilates",fact:"Per capire le lezioni di pilates in inglese è essenziale sapere le parti del corpo! L'istruttrice dirà sempre 'spine' (colonna vertebrale), 'hips' (fianchi), 'shoulders' (spalle). Studia queste e YouTube in inglese diventa facilissimo!",factEn:"To understand English pilates classes you must know body parts! The instructor will always say 'spine', 'hips', 'shoulders'. Learn these and English YouTube videos become super easy!",words:[{en:"spine",it:"colonna vertebrale",ex:"Lengthen your spine nice and tall."},{en:"hips",it:"fianchi",ex:"Open your hips wide and slow."},{en:"shoulders",it:"spalle",ex:"Relax your shoulders down and back."},{en:"stretch",it:"allungamento",ex:"This stretch feels absolutely amazing."},{en:"exhale",it:"espirare",ex:"Exhale and release all tension."}]},
+  {emoji:"🍕",title:"Cibo Italiano in Inglese",titleEn:"Italian Food in English",fact:"Tantissime parole italiane del cibo si usano in inglese senza traduzione: 'al dente', 'bruschetta', 'tiramisu', 'risotto'. Ma 'pepperoni' in America NON è il peperone! È un salame piccante. Errore classicissimo!",factEn:"Many Italian food words are used in English without translation. But 'pepperoni' in America is NOT peperone! It's a spicy salami. A very classic Italian mistake abroad!",words:[{en:"savory",it:"saporito / salato",ex:"This is an incredibly savory dish."},{en:"fresh",it:"fresco",ex:"Always use the freshest ingredients."},{en:"homemade",it:"fatto in casa",ex:"Homemade pasta is always the best."},{en:"aromatic",it:"aromatico",ex:"The tomato sauce is very aromatic."},{en:"indulge",it:"concedersi / viziarsi",ex:"Let's indulge in some good pasta!"}]},
+  {emoji:"🌺",title:"Natura & Stagioni",titleEn:"Nature & Seasons",fact:"Le stagioni: spring (primavera), summer (estate), autumn/fall (autunno), winter (inverno). Gli americani dicono 'fall' per autunno! E 'blossom' è uno dei verbi più belli — fiorire, sbocciare. Si usa anche per le persone: 'She is blossoming.'",factEn:"Seasons: spring, summer, autumn/fall, winter. Americans say 'fall' for autumn! And 'blossom' is one of the most beautiful verbs — fiorire. Also used for people: 'She is blossoming.'",words:[{en:"blossom",it:"fiorire / sbocciare",ex:"She is starting to blossom."},{en:"breeze",it:"brezza",ex:"The sea breeze is so refreshing."},{en:"bloom",it:"fioritura",ex:"The flowers are in full bloom."},{en:"dawn",it:"alba",ex:"I watched the dawn this morning."},{en:"horizon",it:"orizzonte",ex:"Look at that beautiful horizon!"}]},
+  {emoji:"😴",title:"Sogni & Benessere",titleEn:"Dreams & Wellbeing",fact:"'Wellbeing' (benessere) in inglese è una parola sola! 'Self-care' significa prendersi cura di sé. 'Daydream' è sognare ad occhi aperti. 'Hygge' è una parola danese entrata in inglese: il comfort accogliente di stare a casa al caldo.",factEn:"'Wellbeing' is one English word! 'Self-care' means prendersi cura di sé. 'Daydream' means sognare ad occhi aperti. 'Hygge' is a Danish word in English: the cozy comfort of being home and warm.",words:[{en:"wellbeing",it:"benessere",ex:"Your wellbeing always comes first."},{en:"self-care",it:"cura di sé",ex:"Self-care is never selfish."},{en:"daydream",it:"sognare ad occhi aperti",ex:"I love to daydream at the beach."},{en:"nurture",it:"nutrire / prendersi cura",ex:"Nurture your mind, body and soul."},{en:"restful",it:"riposante",ex:"I had the most restful sleep."}]},
+  {emoji:"🎵",title:"Musica & Sentimenti",titleEn:"Music & Feelings",fact:"'Bittersweet' è agrodolce — gioia mista a tristezza. 'Goosebumps' (pelle d'oca) è quello che senti quando una canzone ti emoziona davvero. E 'melancholy' — malinconia — è una delle parole più belle in inglese!",factEn:"'Bittersweet' is agrodolce — joy mixed with sadness. 'Goosebumps' is pelle d'oca. And 'melancholy' — malinconia — is one of the most beautiful English words!",words:[{en:"bittersweet",it:"agrodolce",ex:"This song feels so bittersweet."},{en:"goosebumps",it:"pelle d'oca",ex:"This song gives me goosebumps!"},{en:"soothing",it:"calmante / rilassante",ex:"The music is very soothing."},{en:"melancholy",it:"malinconia",ex:"There is beauty in melancholy."},{en:"uplifting",it:"che tira su il morale",ex:"What an uplifting joyful song!"}]},
+  {emoji:"🚨",title:"False Friends!",titleEn:"False Friends — Attenzione!",fact:"Le 'false friends' sono parole inglesi che SEMBRANO italiane ma significano cose completamente diverse! 'Actually' NON vuol dire 'attualmente' — significa 'in realtà'! 'Library' NON è 'libreria' — è 'biblioteca'! Conoscerle ti evita figuracce imbarazzanti!",factEn:"'False friends' are English words that LOOK Italian but mean completely different things! 'Actually' does NOT mean 'attualmente' — it means 'in realtà'! 'Library' is NOT 'libreria' — it's 'biblioteca'! Knowing them saves you from embarrassing mistakes!",words:[{en:"actually",it:"⚠️ IN REALTÀ (≠ attualmente!)",ex:"Actually, I love Italian food!"},{en:"eventually",it:"⚠️ ALLA FINE (≠ eventualmente!)",ex:"Eventually she learned English."},{en:"library",it:"⚠️ BIBLIOTECA (≠ libreria!)",ex:"I found this at the library."},{en:"sensible",it:"⚠️ RAGIONEVOLE (≠ sensibile!)",ex:"That was a very sensible choice."},{en:"sympathetic",it:"⚠️ COMPRENSIVO (≠ simpatico!)",ex:"She was very sympathetic."}]},
+  {emoji:"💬",title:"Frasi Pratiche",titleEn:"Everyday English Phrases",fact:"Queste sono le frasi che si usano DAVVERO nella vita quotidiana in inglese! Al ristorante, in viaggio, con colleghi stranieri. Imparare frasi complete vale più di 50 parole isolate — sono pronte da usare subito!",factEn:"These are the phrases ACTUALLY used in daily English life! At restaurants, traveling, with foreign colleagues. Learning complete phrases is worth more than isolated words — they're ready to use immediately!",words:[{en:"Can I have the bill, please?",it:"Posso avere il conto, per favore?",ex:"Waiter! Can I have the bill, please?"},{en:"Could you repeat that, please?",it:"Puoi ripetere, per favore?",ex:"Sorry, could you repeat that slowly?"},{en:"How much does it cost?",it:"Quanto costa?",ex:"Excuse me, how much does this cost?"},{en:"I don't understand, sorry.",it:"Non capisco, mi dispiace.",ex:"I don't understand. Can you help me?"},{en:"Nice to meet you!",it:"Piacere di conoscerti!",ex:"Hi, I'm Emanuela! Nice to meet you!"}]},
+  {emoji:"📅",title:"Numeri & Giorni",titleEn:"Numbers & Days",fact:"I giorni della settimana in inglese vengono da divinità nordiche e romane! Monday = Luna (Moon-day), Thursday = Thor (dio del tuono), Friday = Freya (dea dell'amore), Saturday = Saturno. E December viene da 'decem' — dieci in latino, perché era il decimo mese del calendario romano!",factEn:"English days of the week come from Nordic and Roman deities! Monday = Moon-day, Thursday = Thor, Friday = Freya (goddess of love). And December comes from 'decem' — ten in Latin, because it was the 10th month of the Roman calendar!",words:[{en:"Monday / Friday",it:"Lunedì / Venerdì",ex:"I have pilates on Monday and Friday."},{en:"weekend",it:"fine settimana",ex:"I love weekends at the beach!"},{en:"January / December",it:"Gennaio / Dicembre",ex:"My birthday is in December! ♐"},{en:"first / second / third",it:"primo / secondo / terzo",ex:"She lives on the third floor."},{en:"once / twice / always",it:"una volta / due volte / sempre",ex:"I practice pilates twice a week."}]},
+];
+
+const TV=[
+  {show:"The Good Place",emoji:"😇",phrases:[
+    {en:"Everything is fine.",it:"Va tutto bene.",note:"Usata in modo ironico — la situazione NON va bene per niente! 😄"},
+    {en:"You are a good person.",it:"Sei una brava persona.",note:"Una delle frasi più belle e toccanti dell'intera serie."},
+    {en:"What the fork?!",it:"Ma cosa cavolo?!",note:"Fork = forchetta, ma qui sostituisce una parolaccia in modo geniale!"},
+    {en:"I need to think about this.",it:"Ho bisogno di rifletterci.",note:"Utilissima nella vita reale — prenditi il tuo tempo!"},
+    {en:"I want to be a better person.",it:"Voglio essere una persona migliore.",note:"Il cuore dell'intera serie in una frase."},
+    {en:"We can figure this out together.",it:"Possiamo capirlo insieme.",note:"'Figure out' = capire/risolvere. Usatissima!"},
+    {en:"I made a mistake.",it:"Ho fatto un errore.",note:"Importante saperla dire — tutti sbagliano!"},
+    {en:"This is a beautiful place.",it:"Questo è un posto bellissimo.",note:"Semplice, chiara, usabile ovunque."},
+  ]},
+  {show:"Ginny & Georgia",emoji:"💅",phrases:[
+    {en:"I can handle it.",it:"Riesco a gestirlo.",note:"'Handle' = gestire. Un'espressione molto americana e decisa!"},
+    {en:"Are you okay?",it:"Stai bene?",note:"La frase più utile in assoluto in inglese. Imparala per prima!"},
+    {en:"I'm figuring it out.",it:"Sto capendo come fare.",note:"'Figure out' = capire/risolvere. Si usa tantissimo."},
+    {en:"She is my family.",it:"Lei è la mia famiglia.",note:"Bello da usare con le amiche del cuore."},
+    {en:"I feel lost.",it:"Mi sento persa.",note:"'Lost' = perso/a. Si usa tanto in senso figurato."},
+    {en:"We can do this together.",it:"Possiamo farcela insieme.",note:"Motivazionale e bellissima!"},
+    {en:"I just need some space.",it:"Ho solo bisogno di spazio.",note:"Fondamentale saper dire i propri bisogni."},
+    {en:"You have no idea what I've been through.",it:"Non sai cosa ho passato.",note:"Drammatica ma utilissima — usata tantissimo!"},
+  ]},
+  {show:"Bridgerton",emoji:"🌹",phrases:[
+    {en:"I burn for you.",it:"Brucio per te.",note:"La frase più famosa di Simon — pura poesia romantica!"},
+    {en:"You are the most beautiful woman in the room.",it:"Sei la donna più bella della stanza.",note:"Elegante e romantica — usabile ovunque! 😄"},
+    {en:"My heart belongs to you.",it:"Il mio cuore ti appartiene.",note:"Classico romanzo rosa in cinque parole."},
+    {en:"I cannot imagine a world without you.",it:"Non riesco a immaginare un mondo senza di te.",note:"Lunga ma bellissima — imparala per gradi!"},
+    {en:"You have bewitched me.",it:"Mi hai stregato/a.",note:"'Bewitch' = stregare. Parola magica!"},
+    {en:"Shall we dance?",it:"Balliamo?",note:"Elegante e classica — perfetta per una festa!"},
+    {en:"I have never felt this way before.",it:"Non ho mai provato una cosa del genere.",note:"Romantica e utilissima nella vita reale."},
+    {en:"You are unlike anyone I have ever met.",it:"Sei diversa da chiunque io abbia mai incontrato.",note:"Il massimo complimento!"},
+  ]},
+  {show:"Outer Banks",emoji:"🏄",phrases:[
+    {en:"We are the Pogues.",it:"Siamo i Pogues.",note:"'Pogues' è il nome del gruppo di amici — usa 'We are' per presentare te e i tuoi amici!"},
+    {en:"I'm not gonna give up on you.",it:"Non ti abbandonerò.",note:"'Give up on someone' = abbandonare qualcuno. 'Gonna' è il colloquiale americano di 'going to'."},
+    {en:"She is my person.",it:"Lei è la mia persona.",note:"Frase iconica usata anche in Grey's Anatomy — indica la persona più importante della tua vita!"},
+    {en:"Stay gold.",it:"Rimani autentica.",note:"'Gold' qui non è l'oro — significa puro e autentico. Viene da una poesia di Robert Frost!"},
+    {en:"I'll always come back to you.",it:"Tornerò sempre da te.",note:"'I'll' = I will. Una delle promesse più romantiche in inglese — perfetta per Bridgerton! 🌹"},
+    {en:"We're not done yet.",it:"Non abbiamo ancora finito.",note:"'Done' = finito. 'Not done yet' = non ancora finito. Si usa tantissimo nella vita reale!"},
+    {en:"The treasure is real.",it:"Il tesoro è reale.",note:"'Real' = reale/vero. Attenzione: 'really' come avverbio significa 'davvero'!"},
+    {en:"I trust you with my life.",it:"Ti affido la mia vita.",note:"'Trust someone with something' = fidarsi di qualcuno per qualcosa. Bella e intensa!"},
+  ]},
+  {show:"Never Have I Ever",emoji:"🌸",phrases:[
+    {en:"You deserve good things.",it:"Meriti cose belle.",note:"'Deserve' = meritare. Una delle parole più belle in inglese — usala con te stessa ogni giorno!"},
+    {en:"I'm going to have a great year.",it:"Avrò un anno fantastico.",note:"'Going to' si usa per piani certi. 'Great' = fantastico. Dillo ogni mattina allo specchio!"},
+    {en:"Stop trying to be perfect.",it:"Smettila di cercare di essere perfetta.",note:"'Stop + -ing' = smettila di fare qualcosa. Una struttura importantissima in inglese!"},
+    {en:"It's okay to ask for help.",it:"Va bene chiedere aiuto.",note:"'It's okay to...' + verbo infinito. Formula utilissima — impara questa struttura!"},
+    {en:"You matter to me.",it:"Sei importante per me.",note:"'To matter' NON è 'materia'! Significa essere importante. 'You matter' è bellissima!"},
+    {en:"She is stronger than she thinks.",it:"È più forte di quanto pensi.",note:"'Stronger than...' = più forte di... I comparativi in inglese si fanno con -er o 'more'!"},
+    {en:"I don't know how to do this.",it:"Non so come farlo.",note:"'I don't know how to...' + infinito. Una delle strutture più utili dell'inglese quotidiano!"},
+    {en:"Give yourself a chance.",it:"Datti una possibilità.",note:"'Give yourself a chance' = datti una possibilità. Anche 'give someone a chance' = dare una chance!"},
+  ]},
+  {show:"Wednesday",emoji:"🖤",phrases:[
+    {en:"I don't have friends. I have accomplices.",it:"Non ho amici. Ho complici.",note:"Frase iconica di Wednesday! 'Accomplice' = complice. Molto più intrigante di 'friend'! 🖤"},
+    {en:"Normal is an illusion.",it:"Il normale è un'illusione.",note:"'Illusion' = illusione — stessa parola! E 'normal' si pronuncia NOR-mal."},
+    {en:"I like to follow my own path.",it:"Mi piace seguire la mia strada.",note:"'Follow your own path' = seguire la propria strada. Frase motivazionale bellissima!"},
+    {en:"Don't underestimate me.",it:"Non sottovalutarmi.",note:"'Underestimate' = sottovalutare. 'Under' in inglese spesso significa 'sotto' o 'meno del dovuto'."},
+    {en:"The truth always comes out.",it:"La verità viene sempre a galla.",note:"'Come out' = venire fuori. 'The truth comes out' — si usa tantissimo nelle serie!"},
+    {en:"My gift is also my curse.",it:"Il mio dono è anche la mia maledizione.",note:"'Gift' = dono. 'Curse' = maledizione. Perfetto per chi ama cristalli e magia! 💜"},
+    {en:"I am an acquired taste.",it:"Sono un gusto acquisito.",note:"'Acquired taste' = qualcosa che non piace subito ma si impara ad apprezzare. Elegantissima!"},
+    {en:"I don't need your approval.",it:"Non ho bisogno della tua approvazione.",note:"'Approval' = approvazione. 'I don't need' = non ho bisogno. Usatissima — e molto Wednesday!"},
+  ]},
+  {show:"Heartstopper",emoji:"🍂",phrases:[
+    {en:"I just want to be happy.",it:"Voglio solo essere felice.",note:"'Just' qui significa 'semplicemente'. 'I just want to...' = voglio solo... Dolcissima!"},
+    {en:"You are not alone.",it:"Non sei sola.",note:"Una delle frasi più importanti in inglese. Semplice, potentissima, sempre utile."},
+    {en:"It's okay to be yourself.",it:"Va bene essere se stessi.",note:"'Be yourself' = essere se stessi. Una delle prime cose da imparare in inglese!"},
+    {en:"You make me feel like myself.",it:"Mi fai sentire me stessa.",note:"'Make someone feel' = far sentire qualcuno. Struttura bellissima e romantica!"},
+    {en:"You are enough.",it:"Sei abbastanza.",note:"'Enough' = abbastanza. Due parole, significato immenso. Tatuatela! 🌸"},
+    {en:"Friendship is everything.",it:"L'amicizia è tutto.",note:"'Friendship' = amicizia — si forma da 'friend' + '-ship'. Tanti sostantivi astratti finiscono così!"},
+    {en:"Just breathe.",it:"Respira soltanto.",note:"Semplice e potente! Perfetta anche durante il pilates — 'just breathe, engage your core!' 🧘"},
+    {en:"I think about you all the time.",it:"Penso a te continuamente.",note:"'All the time' = sempre, continuamente. Molto più enfatico di 'always' — super romantico!"},
+  ]},
+];
+
+const PROVERBS=[
+  {en:"Every cockroach is pretty to his mother",
+   nap:"Ogn scarrafon è bell a mamma soij",
+   it:"Ogni scarafaggio è bello per la sua mamma",
+   meaning:"Ogni madre vede sempre il meglio nei suoi figli — non importa come siano agli occhi degli altri. L'amore materno è cieco e bellissimo!",
+   meaningEn:"Every mother always sees the best in her children — no matter how they appear to others. A mother's love is beautifully blind!",
+   words:[
+     {en:"cockroach",it:"scarafaggio",ex:"Every cockroach is pretty to his mother."},
+     {en:"pretty",it:"bello / carino",ex:"The moonlight looks so pretty tonight."},
+     {en:"mother",it:"madre / mamma",ex:"My mother always believes in me."},
+   ]},
+  {en:"When devil caresses you, he wants the soul",
+   nap:"Quand o riavl taccarezz, l'anim va truvann",
+   it:"Quando il diavolo ti accarezza, vuole l'anima",
+   meaning:"Quando qualcuno è troppo gentile senza motivo, di solito vuole qualcosa in cambio. Stai attenta a chi ti riempie di attenzioni improvvise!",
+   meaningEn:"When someone is unusually kind for no reason, they usually want something in return. Beware of people who suddenly shower you with attention!",
+   words:[
+     {en:"devil",it:"diavolo",ex:"When devil caresses you, be careful."},
+     {en:"caress",it:"accarezzare",ex:"She caressed the crystal gently."},
+     {en:"soul",it:"anima",ex:"Moonstone connects to your soul."},
+   ]},
+];
+
+const LEVELS=[
+  {name:"Principiante",icon:"🌱",max:50},
+  {name:"Esploratrice",icon:"🌿",max:150},
+  {name:"Lettrice",icon:"📚",max:300},
+  {name:"Saggia",icon:"⭐",max:500},
+  {name:"Maestra",icon:"🌕",max:Infinity},
+];
+
+const ACHIEVEMENTS=[
+  {id:"first_word",icon:"🌱",title:"Prima Parola!",desc:"Hai imparato la tua prima parola in inglese!"},
+  {id:"ten_words",icon:"✨",title:"10 Parole!",desc:"Stai crescendo velocemente!"},
+  {id:"fifty_words",icon:"💫",title:"50 Parole!",desc:"Sei a metà strada — ottimo lavoro!"},
+  {id:"hundred_words",icon:"🌟",title:"100 Parole!",desc:"Sei incredibile — quasi una maestra!"},
+  {id:"perfect_quiz",icon:"💯",title:"Quiz Perfetta!",desc:"10/10 corrette — straordinaria!"},
+  {id:"streak_3",icon:"🔥",title:"3 giorni di fila!",desc:"La costanza è la chiave del successo!"},
+  {id:"streak_7",icon:"🔥🔥",title:"7 giorni di fila!",desc:"Una settimana intera! Bravissima!"},
+  {id:"full_moon",icon:"🌕",title:"Luna Piena!",desc:"Hai raggiunto 100 XP — fantastica!"},
+  {id:"daily_done",icon:"📅",title:"Prima Sfida del Giorno!",desc:"Prima sfida quotidiana completata!"},
+  {id:"master",icon:"👑",title:"Maestra!",desc:"Hai raggiunto il livello massimo — leggendaria!"},
+  {id:"false_friend",icon:"🚨",title:"Amica dei False Friends!",desc:"Hai imparato i false friends più insidiosi!"},
+];
+
+const MOON=["🌑","🌒","🌓","🌔","🌕"];
+const NOTIF_MSGS=["Scus giovane! 🌙 Pronta per una lezione?","Luna & Letters ti aspetta! ✨ Quan sarapn salam e prosutt zij Nicol acop e zij Nicol a sott.","Buongiorno! 💎 Il cristallo di oggi ti aspetta.","È ora di studiare inglese! 🌸 La luna ti dà energia.AIII","Ciao! 🔮 Una nuova parola al giorno fa miracoli! come Kociack e maioe","Hey Emanuela! ⭐ Il tuo segno dice: te a mettr a frecc quand s gir!","La tua luna cresce! 🌒 quand s zapp e s pot zij Nicol nu ten nipot."];
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+function getLevel(xp){return LEVELS.find(l=>xp<l.max)||LEVELS[LEVELS.length-1];}
+function getLevelProgress(xp){
+  const i=LEVELS.findIndex(l=>xp<l.max);
+  if(i<0) return{pct:100,current:LEVELS[LEVELS.length-1]};
+  const prev=i>0?LEVELS[i-1].max:0;
+  return{pct:Math.round((xp-prev)/(LEVELS[i].max-prev)*100),current:LEVELS[i],next:LEVELS[i+1]};
+}
+function getWordOfDay(all){return all[Math.floor(Date.now()/86400000)%all.length];}
+function todayStr(){return new Date().toDateString();}
+
+const S={
+  app:{minHeight:"100vh",background:"linear-gradient(160deg,#0d0221 0%,#1a0533 40%,#0d1b4b 100%)",color:"#fff",fontFamily:"system-ui,sans-serif"},
+  wrap:{maxWidth:500,margin:"0 auto",padding:"0 16px 90px"},
+  card:(ex={})=>({background:"rgba(255,255,255,0.06)",borderRadius:20,border:"1px solid rgba(255,255,255,0.12)",padding:20,marginBottom:16,...ex}),
+  btn:(g="linear-gradient(135deg,#7c4dff,#e040fb)",ex={})=>({background:g,border:"none",borderRadius:14,padding:"12px 22px",color:"#fff",fontSize:15,fontWeight:700,cursor:"pointer",...ex}),
+  soft:(ex={})=>({background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:14,padding:"10px 18px",color:"#fff",fontSize:14,cursor:"pointer",...ex}),
+  back:{background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:12,padding:"8px 16px",color:"#b0bec5",fontSize:13,cursor:"pointer",marginBottom:16},
+  bar:{background:"rgba(255,255,255,0.1)",borderRadius:10,height:8,overflow:"hidden",margin:"8px 0"},
+  fill:(p)=>({height:"100%",width:`${Math.min(p,100)}%`,background:"linear-gradient(90deg,#7c4dff,#f48fb1,#81d4fa)",borderRadius:10,transition:"width 0.6s ease"}),
+  gtxt:{fontSize:26,fontWeight:800,background:"linear-gradient(90deg,#b39ddb,#f48fb1,#81d4fa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"},
+  muted:{color:"#b0bec5",fontSize:13},
+  center:{textAlign:"center"},
+  spk:{background:"rgba(144,202,249,0.15)",border:"1px solid rgba(144,202,249,0.3)",borderRadius:20,padding:"6px 16px",color:"#90caf9",fontSize:13,cursor:"pointer",margin:"8px 0 4px"},
+};
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────────
+function Confetti(){
+  const[pieces]=useState(()=>Array.from({length:65},(_,i)=>({
+    id:i,x:Math.random()*100,delay:Math.random()*0.9,
+    dur:2.2+Math.random()*1.8,size:5+Math.random()*9,
+    color:['#7c4dff','#e040fb','#ffd54f','#f48fb1','#81d4fa','#a5d6a7','#ffab40','#ff6f00','#fff176'][i%9],
+    rot:Math.random()*360,circle:Math.random()>0.5
+  })));
+  return(
+    <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none',zIndex:10000,overflow:'hidden'}}>
+      {pieces.map(p=>(
+        <div key={p.id} style={{position:'absolute',left:`${p.x}%`,top:0,width:p.size,height:p.size,
+          background:p.color,borderRadius:p.circle?'50%':'2px',
+          animation:`confettiFall ${p.dur}s ${p.delay}s ease-in forwards`,
+          transform:`rotate(${p.rot}deg)`}}/>
+      ))}
+    </div>
+  );
+}
+
+// ── APP ───────────────────────────────────────────────────────────────────────
+function App(){
+  // ── Persistent state ──────────────────────────────────────────
+  const LS=(k,d)=>{try{const v=localStorage.getItem(k);return v!==null?v:d;}catch{return d;}};
+  const[xp,setXp]=useState(()=>parseInt(LS('ll_xp','0')));
+  const[learned,setLearned]=useState(()=>{try{return new Set(JSON.parse(LS('ll_learned','[]')));}catch{return new Set();}});
+  const[streak,setStreak]=useState(()=>parseInt(LS('ll_streak','0')));
+  const[lastStudy,setLastStudy]=useState(()=>LS('ll_lastStudy',''));
+  const[achievements,setAchievements]=useState(()=>{try{return new Set(JSON.parse(LS('ll_ach','[]')));}catch{return new Set();}});
+  const[welcomed,setWelcomed]=useState(()=>LS('ll_welcomed','')!=='');
+  const[notifEnabled,setNotifEnabled]=useState(()=>LS('ll_notif','')==='1'&&typeof Notification!=='undefined'&&Notification.permission==='granted');
+  const[dailyDone,setDailyDone]=useState(()=>{try{const d=JSON.parse(LS('ll_daily','{}'));return d.date===todayStr()&&d.done;}catch{return false;}});
+
+  useEffect(()=>{try{localStorage.setItem('ll_xp',xp);}catch{}},[xp]);
+  useEffect(()=>{try{localStorage.setItem('ll_learned',JSON.stringify([...learned]));}catch{}},[learned]);
+  useEffect(()=>{try{localStorage.setItem('ll_ach',JSON.stringify([...achievements]));}catch{}},[achievements]);
+
+  // ── UI state ─────────────────────────────────────────────────
+  const[screen,setScreen]=useState('home');
+  const[welcomeStep,setWelcomeStep]=useState(0);
+  const[newAch,setNewAch]=useState(null);
+  const[showFlash,setShowFlash]=useState(false);
+  const[showReset,setShowReset]=useState(false);
+
+  // ── Crystal ──────────────────────────────────────────────────
+  const[crystalI,setCrystalI]=useState(()=>new Date().getDay()%CRYSTALS.length);
+  const[wordI,setWordI]=useState(0);
+  const[flipped,setFlipped]=useState(false);
+  const[flipping,setFlipping]=useState(false);
+
+  // ── Zodiac ───────────────────────────────────────────────────
+  const[zodiacI,setZodiacI]=useState(()=>ZODIAC.findIndex(z=>z.isEmanuela));
+
+  // ── Facts ────────────────────────────────────────────────────
+  const[factI,setFactI]=useState(0);
+  const[factWordI,setFactWordI]=useState(0);
+  const[factFlipped,setFactFlipped]=useState(false);
+  const[factFlipping,setFactFlipping]=useState(false);
+
+  // ── TV ───────────────────────────────────────────────────────
+  const[tvI,setTvI]=useState(0);
+  const[tvPI,setTvPI]=useState(0);
+  const[tvRev,setTvRev]=useState(false);
+  const[provI,setProvI]=useState(0);
+  const[provWordI,setProvWordI]=useState(0);
+  const[provWordFlipped,setProvWordFlipped]=useState(false);
+  const[provWordFlipping,setProvWordFlipping]=useState(false);
+
+  // ── Quiz ─────────────────────────────────────────────────────
+  const[quiz,setQuiz]=useState(null);
+  const[qStep,setQStep]=useState(0);
+  const[qAns,setQAns]=useState(null);
+  const[qScore,setQScore]=useState(0);
+  const[qDone,setQDone]=useState(false);
+  const[qRev,setQRev]=useState(false);
+  const[qDaily,setQDaily]=useState(false);
+  const[tvQuizMode,setTvQuizMode]=useState(null);
+
+  // Welcome-back notification
+  useEffect(()=>{
+    const last=parseInt(LS('ll_lastVisit','0'));
+    const now=Date.now();
+    try{localStorage.setItem('ll_lastVisit',now);}catch{}
+    if(last>0&&typeof Notification!=='undefined'&&Notification.permission==='granted'&&(now-last)/3600000>20){
+      const msg=NOTIF_MSGS[Math.floor(Math.random()*NOTIF_MSGS.length)];
+      try{navigator.serviceWorker.ready.then(r=>r.showNotification('Luna & Letters 🌙',{body:msg,icon:'./icon-192.png',vibrate:[200,100,200]}));}
+      catch{try{new Notification('Luna & Letters 🌙',{body:msg});}catch{}}
+    }
+  },[]);
+
+  // ── Functions ────────────────────────────────────────────────
+  function unlockAch(id){
+    setAchievements(prev=>{
+      if(prev.has(id)) return prev;
+      const a=ACHIEVEMENTS.find(x=>x.id===id);
+      if(!a) return prev;
+      setTimeout(()=>{setNewAch(a);setTimeout(()=>setNewAch(null),3200);},200);
+      return new Set([...prev,id]);
+    });
+  }
+
+  function addXP(n){
+    setXp(prev=>{
+      const next=prev+n;
+      if(prev<100&&next>=100) setTimeout(()=>unlockAch('full_moon'),300);
+      if(prev<LEVELS[LEVELS.length-2].max&&next>=LEVELS[LEVELS.length-2].max) setTimeout(()=>unlockAch('master'),300);
+      return next;
+    });
+  }
+
+  function markStudied(){
+    const today=todayStr(),yest=new Date(Date.now()-86400000).toDateString();
+    if(lastStudy===today) return;
+    const ns=lastStudy===yest?streak+1:1;
+    setStreak(ns);setLastStudy(today);
+    try{localStorage.setItem('ll_streak',ns);localStorage.setItem('ll_lastStudy',today);}catch{}
+    if(ns===3) setTimeout(()=>unlockAch('streak_3'),300);
+    if(ns===7) setTimeout(()=>unlockAch('streak_7'),300);
+  }
+
+  function learnWord(w){
+    if(learned.has(w)) return;
+    const ns=new Set([...learned,w]);
+    setLearned(ns);addXP(5);markStudied();
+    const c=ns.size;
+    setTimeout(()=>{
+      if(c===1) unlockAch('first_word');
+      if(c===10) unlockAch('ten_words');
+      if(c===50) unlockAch('fifty_words');
+      if(c===100) unlockAch('hundred_words');
+    },200);
+    // false friend achievement
+    const ffWords=['actually','eventually','library','sensible','sympathetic'];
+    if(ffWords.includes(w)&&ffWords.every(fw=>ns.has(fw))) setTimeout(()=>unlockAch('false_friend'),300);
+  }
+
+  function speak(text){
+    if(!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.82;window.speechSynthesis.speak(u);
+  }
+
+  function playSound(ok){
+    try{
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      if(ok){
+        o.type='sine';o.frequency.value=523;
+        g.gain.setValueAtTime(0.18,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+        o.start();o.stop(ctx.currentTime+0.5);
+      }else{
+        o.type='square';o.frequency.value=160;
+        g.gain.setValueAtTime(0.1,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.22);
+        o.start();o.stop(ctx.currentTime+0.22);
+      }
+    }catch{}
+  }
+
+  // ── Chat ─────────────────────────────────────────────────────
+  const[chatMessages,setChatMessages]=useState([]);
+  const[chatInput,setChatInput]=useState('');
+  const[chatLoading,setChatLoading]=useState(false);
+  const[ttsEnabled,setTtsEnabled]=useState(false);
+  const[listening,setListening]=useState(false);
+  const chatBottomRef=useRef(null);
+  useEffect(()=>{chatBottomRef.current?.scrollIntoView({behavior:'smooth'});},[chatMessages,chatLoading]);
+
+  async function handleSend(text){
+    const msg=(text!==undefined?text:chatInput).trim();
+    if(!msg||chatLoading) return;
+    setChatInput('');
+    const userMsg={role:'user',content:msg};
+    const history=[...chatMessages,userMsg];
+    setChatMessages(history);
+    setChatLoading(true);
+    try{
+      const res=await fetch('/.netlify/functions/chat',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:history}),
+      });
+      const data=await res.json();
+      const reply=data.text||data.error||'Ops, qualcosa non ha funzionato. Riprova! 🌙';
+      setChatMessages(m=>[...m,{role:'assistant',content:reply}]);
+      if(ttsEnabled){
+        const clean=reply.replace(/[\u{1F1E6}-\u{1F1FF}]/gu,'').replace(/[✨🌙🌸🔮💎⭐💡]/gu,'').replace(/\n/g,' ');
+        speak(clean);
+      }
+    }catch{
+      setChatMessages(m=>[...m,{role:'assistant',content:'Ops, non riesco a rispondere ora. Controlla la connessione! 🌙'}]);
+    }finally{setChatLoading(false);}
+  }
+
+  function startListening(){
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){alert('Il microfono non è supportato su questo browser.\nProva a usare Chrome!');return;}
+    const r=new SR();
+    r.lang='it-IT';r.interimResults=false;
+    setListening(true);
+    r.onresult=e=>{setChatInput(e.results[0][0].transcript);setListening(false);};
+    r.onerror=()=>setListening(false);
+    r.onend=()=>setListening(false);
+    r.start();
+  }
+
+  function doFlip(setFlip,setFlipAnim,cb){
+    if(setFlip===setFlipped&&flipped) return;
+    if(setFlip===setFactFlipped&&factFlipped) return;
+    setFlipAnim(true);
+    setTimeout(()=>{cb();setFlipAnim(false);},160);
+  }
+
+  function startQuiz(count,rev,daily){
+    const all=[];
+    CRYSTALS.forEach(c=>c.words.forEach(w=>all.push(w)));
+    FACTS.forEach(f=>f.words.forEach(w=>all.push(w)));
+    const sel=shuffle(all).slice(0,count);
+    const qs=sel.map(q=>{
+      const wrong=shuffle(all.filter(w=>rev?w.en!==q.en:w.it!==q.it)).slice(0,3);
+      return{...q,options:shuffle([q,...wrong])};
+    });
+    setQuiz(qs);setQStep(0);setQScore(0);setQAns(null);setQDone(false);setQRev(rev);setQDaily(daily);
+    setTvQuizMode(null);
+    setScreen('quiz');
+  }
+
+  function startTVQuiz(mode){
+    const all=[];
+    TV.forEach(s=>s.phrases.forEach(p=>all.push({...p,show:s.show,showEmoji:s.emoji})));
+    const sel=shuffle(all).slice(0,10);
+    const qs=sel.map(q=>{
+      if(mode==='show'){
+        const wrongShows=shuffle(TV.map(s=>({show:s.show,showEmoji:s.emoji})).filter(s=>s.show!==q.show)).slice(0,3);
+        return{...q,options:shuffle([{show:q.show,showEmoji:q.showEmoji},...wrongShows])};
+      } else {
+        const wrong=shuffle(all.filter(p=>p.it!==q.it)).slice(0,3);
+        return{...q,options:shuffle([q,...wrong])};
+      }
+    });
+    setQuiz(qs);setQStep(0);setQScore(0);setQAns(null);setQDone(false);setQRev(false);setQDaily(false);
+    setTvQuizMode(mode);
+    setScreen('quiz');
+  }
+
+  function handleAns(opt){
+    if(qAns) return;
+    setQAns(opt);
+    let correct;
+    if(tvQuizMode==='show') correct=opt.show===quiz[qStep].show;
+    else if(tvQuizMode==='translate') correct=opt.it===quiz[qStep].it;
+    else correct=qRev?opt.en===quiz[qStep].en:opt.it===quiz[qStep].it;
+    if(correct){setQScore(s=>s+1);addXP(qDaily||qRev?20:10);markStudied();}
+    playSound(correct);
+    setTimeout(()=>{
+      if(qStep+1>=quiz.length){
+        setQDone(true);
+        const finalScore=qScore+(correct?1:0);
+        if(!qRev&&finalScore===quiz.length&&quiz.length===10){setTimeout(()=>unlockAch('perfect_quiz'),300);setShowFlash(true);setTimeout(()=>setShowFlash(false),900);}
+        if(qDaily){
+          setDailyDone(true);
+          try{localStorage.setItem('ll_daily',JSON.stringify({date:todayStr(),done:true}));}catch{}
+          setTimeout(()=>unlockAch('daily_done'),300);
+        }
+      } else{setQStep(s=>s+1);setQAns(null);}
+    },1300);
+  }
+
+  function resetProgress(){
+    ['ll_xp','ll_learned','ll_streak','ll_lastStudy','ll_ach','ll_daily'].forEach(k=>{try{localStorage.removeItem(k);}catch{}});
+    setXp(0);setLearned(new Set());setStreak(0);setLastStudy('');setAchievements(new Set());setDailyDone(false);setShowReset(false);
+  }
+
+  async function enableNotifications(){
+    const standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+    if(!('Notification' in window)){alert('Usa Safari e aggiungi l\'app alla schermata Home per le notifiche!');return;}
+    if(!standalone){alert('Per le notifiche su iPhone:\n1. Apri in Safari\n2. Condividi ⬆️\n3. "Aggiungi alla schermata Home"\n4. Riapri dall\'icona e riprova!');return;}
+    const p=await Notification.requestPermission();
+    if(p==='granted'){
+      setNotifEnabled(true);try{localStorage.setItem('ll_notif','1');}catch{}
+      try{const r=await navigator.serviceWorker.ready;await r.showNotification('Luna & Letters 🌙',{body:'Notifiche attivate! Ciao Emanuela! 🌸',icon:'./icon-192.png',vibrate:[200,100,200]});}
+      catch{try{new Notification('Luna & Letters 🌙',{body:'Notifiche attivate!'});}catch{}}
+    } else if(p==='denied') alert('Notifiche bloccate. Vai in Impostazioni → Safari → Notifiche.');
+  }
+
+  // ── Computed ─────────────────────────────────────────────────
+  const moon=MOON[Math.min(Math.floor(xp/25),4)];
+  const{pct:lvlPct,current:lvl}=getLevelProgress(xp);
+  const allWords=[];
+  CRYSTALS.forEach(c=>c.words.forEach(w=>allWords.push(w)));
+  FACTS.forEach(f=>f.words.forEach(w=>allWords.push(w)));
+  const wod=getWordOfDay(allWords);
+  const cW=CRYSTALS.flatMap(c=>c.words.map(w=>w.en));
+  const fW=FACTS.flatMap(f=>f.words.map(w=>w.en));
+  const tW=TV.flatMap(s=>s.phrases.map(p=>p.en));
+  const cDone=cW.filter(w=>learned.has(w)).length;
+  const fDone=fW.filter(w=>learned.has(w)).length;
+  const tDone=tW.filter(w=>learned.has(w)).length;
+
+  // ── WELCOME ───────────────────────────────────────────────────
+  if(!welcomed){
+    const slides=[
+      {e:"🌙",t:"Ciao Emanuela! 👋",s:"Questa app è stata creata apposta per te 💙",b:"Impara l'inglese con le cose che ami di più — cristalli, astrologia, romanzi rosa e le tue serie preferite!"},
+      {e:"💎⭐📚",t:"Tutto quello che ami",s:"Cristalli · Astrologia · Romanzi · Serie TV · Quiz",b:"Ogni sezione ha parole pensate per te. Premi 🔊 su ogni parola per sentire come si pronuncia in inglese!"},
+      {e:"🔥🌕🏆",t:"Fai crescere la tua luna!",s:"Streak · Livelli · Badge · Sfida del Giorno",b:"Guadagna XP studiando, mantieni la serie 🔥 tornando ogni giorno e sblocca tutti i badge. Sei pronta?"},
+    ];
+    const sl=slides[welcomeStep];
+    return(
+      <div style={{...S.app,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 24px",textAlign:"center"}}>
+        <div style={{maxWidth:400,width:"100%",animation:"fadeIn 0.4s ease"}}>
+          <div style={{fontSize:64,marginBottom:16,animation:"pulse 2s infinite"}}>{sl.e}</div>
+          <div style={{...S.gtxt,fontSize:28,marginBottom:8}}>{sl.t}</div>
+          <div style={{color:"#90caf9",fontSize:15,marginBottom:12,fontStyle:"italic"}}>{sl.s}</div>
+          <div style={{color:"#b0bec5",fontSize:14,lineHeight:1.8,marginBottom:32}}>{sl.b}</div>
+          <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:24}}>
+            {slides.map((_,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:i===welcomeStep?"#7c4dff":"rgba(255,255,255,0.2)",transition:"all 0.3s"}}/>)}
+          </div>
+          {welcomeStep<slides.length-1
+            ?<button style={S.btn()} onClick={()=>setWelcomeStep(s=>s+1)}>Avanti →</button>
+            :<button style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)",{fontSize:17,padding:"14px 32px"})} onClick={()=>{setWelcomed(true);try{localStorage.setItem('ll_welcomed','1');}catch{}}}>Iniziamo! 🌙</button>
+          }
+        </div>
+      </div>
+    );
+  }
+
+  // ── GLOBAL OVERLAYS (used in every screen) ───────────────────
+  const overlays=(
+    <>
+      {showFlash&&<div style={{position:"fixed",inset:0,background:"linear-gradient(135deg,rgba(255,215,0,0.35),rgba(224,64,251,0.25))",pointerEvents:"none",zIndex:9997,animation:"screenFlash 0.9s ease forwards"}}/>}
+      {newAch&&<Confetti/>}
+      {newAch&&<div style={{position:"fixed",bottom:28,left:"50%",transform:"translateX(-50%)",background:"linear-gradient(135deg,#3a006f,#7c4dff,#e040fb)",borderRadius:24,padding:"20px 28px",zIndex:10001,textAlign:"center",boxShadow:"0 0 0 2px rgba(255,255,255,0.15), 0 12px 48px rgba(124,77,255,0.7)",minWidth:280,animation:"achBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards"}}>
+        <div style={{fontSize:52,marginBottom:6,display:"inline-block",animation:"iconSpin 0.6s 0.1s cubic-bezier(0.34,1.56,0.64,1) both"}}>{newAch.icon}</div>
+        <div style={{fontWeight:900,fontSize:11,letterSpacing:2,color:"rgba(255,255,255,0.7)",textTransform:"uppercase",marginBottom:2}}>✨ Badge sbloccato!</div>
+        <div style={{fontWeight:800,fontSize:18,color:"#ffd54f",margin:"2px 0"}}>{newAch.title}</div>
+        <div style={{color:"rgba(255,255,255,0.75)",fontSize:13,marginTop:4}}>{newAch.desc}</div>
+      </div>}
+    </>
+  );
+
+  // ── HOME ──────────────────────────────────────────────────────
+  if(screen==="home") return(
+    <div style={S.app}><div style={S.wrap}>
+      <div style={{...S.center,padding:"24px 0 12px"}}>
+        <div style={{fontSize:44,marginBottom:2}}>{moon}</div>
+        <div style={S.gtxt}>Luna & Letters</div>
+        <div style={{...S.muted,marginTop:2}}>Il tuo viaggio in inglese ✨</div>
+      </div>
+
+      {/* Level + XP + Streak */}
+      <div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:16})}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <span style={{fontSize:28}}>{lvl.icon}</span>
+            <div><div style={{fontWeight:700,fontSize:15}}>{lvl.name}</div><div style={S.muted}>⭐ {xp} XP</div></div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:24}}>🔥</div>
+            <div style={{fontWeight:700,fontSize:15}}>{streak} {streak===1?"giorno":"giorni"}</div>
+            <div style={{...S.muted,fontSize:11}}>di fila</div>
+          </div>
+        </div>
+        <div style={S.bar}><div style={S.fill(lvlPct)}/></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
+          <div style={{...S.muted,fontSize:11}}>💾 {learned.size}/{allWords.length} parole</div>
+          {!showReset
+            ?<button onClick={()=>setShowReset(true)} style={{background:"none",border:"none",color:"#546e7a",fontSize:11,cursor:"pointer"}}>Reset</button>
+            :<div style={{display:"flex",gap:6,alignItems:"center"}}>
+              <span style={{...S.muted,fontSize:11}}>Sei sicura?</span>
+              <button onClick={resetProgress} style={{background:"rgba(244,67,54,0.2)",border:"1px solid #f44336",borderRadius:8,padding:"3px 8px",color:"#ef9a9a",fontSize:11,cursor:"pointer"}}>Sì</button>
+              <button onClick={()=>setShowReset(false)} style={{background:"none",border:"none",color:"#b0bec5",fontSize:11,cursor:"pointer"}}>No</button>
+            </div>
+          }
+        </div>
+      </div>
+
+      {/* Word of Day */}
+      <div style={S.card({background:"linear-gradient(135deg,#4a148c44,#7c4dff22)",borderColor:"#7c4dff55",marginBottom:16})}>
+        <div style={{...S.muted,fontSize:11,marginBottom:6}}>🌟 Parola del Giorno</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:22,fontWeight:800}}>{wod.en}</div>
+            <div style={{color:"#a5d6a7",fontSize:14,marginTop:2}}>{wod.it}</div>
+            <div style={{...S.muted,fontSize:12,marginTop:4,fontStyle:"italic"}}>"{wod.ex}"</div>
+          </div>
+          <button onClick={()=>speak(wod.en)} style={{...S.spk,margin:"0 0 0 12px",flexShrink:0}}>🔊</button>
+        </div>
+        <button onClick={()=>learnWord(wod.en)} disabled={learned.has(wod.en)} style={{width:"100%",background:learned.has(wod.en)?"rgba(76,175,80,0.15)":"linear-gradient(135deg,#7c4dff,#e040fb)",border:learned.has(wod.en)?"1px solid #4caf5033":"none",borderRadius:14,padding:"10px",color:learned.has(wod.en)?"#a5d6a7":"#fff",fontSize:13,fontWeight:700,cursor:learned.has(wod.en)?"default":"pointer"}}>
+          {learned.has(wod.en)?"✅ Parola del giorno imparata!":"⭐ Segna come imparata · +5 XP"}
+        </button>
+      </div>
+
+      {/* Daily Challenge */}
+      <div style={S.card({background:dailyDone?"linear-gradient(135deg,#1b5e2033,#4caf5022)":"linear-gradient(135deg,#bf360c44,#ff6f0022)",borderColor:dailyDone?"#4caf5055":"#ff6f0055",marginBottom:16})}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{fontSize:28}}>{dailyDone?"✅":"🔥"}</div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:14}}>Sfida del Giorno</div>
+            <div style={S.muted}>{dailyDone?"Completata! Torna domani 🌙":"5 domande · XP doppio · solo oggi!"}</div>
+          </div>
+          {!dailyDone&&<button style={S.btn("linear-gradient(135deg,#e65100,#ff6f00)",{fontSize:13,padding:"8px 14px"})} onClick={()=>startQuiz(5,false,true)}>Inizia!</button>}
+        </div>
+      </div>
+
+      {/* Section Cards with progress */}
+      {[
+        {id:"crystal",icon:"💎",label:"Cristalli & Luna",sub:"10 cristalli · consigli lunari",done:cDone,total:cW.length,col:"#3949ab"},
+        {id:"zodiac",icon:"⭐",label:"Astrologia in Inglese",sub:"12 segni · Sagittario ♐ approfondito",done:null,col:"#6a1b9a"},
+        {id:"facts",icon:"🌊",label:"Fun Facts & Vocaboli",sub:"21 temi · False Friends · Frasi pratiche",done:fDone,total:fW.length,col:"#01579b"},
+        {id:"tv",icon:"📺",label:"Frasi dalle Serie TV",sub:`${tDone} frasi sbloccate · 3 serie`,done:null,col:"#880e4f"},
+        {id:"quizPick",icon:"🎮",label:"Quiz & Sfide",sub:"Normale · Inverso IT→EN · Giornaliera",done:null,col:"#1b5e20"},
+        {id:"achievements",icon:"🏆",label:"I Tuoi Badge",sub:`${achievements.size}/${ACHIEVEMENTS.length} sbloccati`,done:achievements.size,total:ACHIEVEMENTS.length,col:"#e65100"},
+        {id:"proverbi",icon:"🤌",label:"Detti Napoletani in Inglese",sub:`${PROVERBS.length} proverbi · 🗺️ napoletano · 🇮🇹 italiano · 🇬🇧 inglese`,done:null,col:"#bf360c"},
+        {id:"chat",icon:"🤖",imgIcon:"Luna_AI_assistant.png",label:"Chatta con Luna ✨",sub:"La tua tutor AI · scrivi o parla · italiano & inglese",done:null,col:"#00695c"},
+      ].map(sec=>(
+        <div key={sec.id} onClick={()=>setScreen(sec.id)}
+          style={S.card({background:`linear-gradient(135deg,${sec.col}55,${sec.col}22)`,borderColor:`${sec.col}60`,display:"flex",alignItems:"center",gap:16,cursor:"pointer"})}>
+          <div style={{fontSize:32,flexShrink:0}}>
+            {sec.imgIcon
+              ?<img src={sec.imgIcon} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",border:"2px solid rgba(0,188,212,0.4)"}} alt="Luna"/>
+              :sec.icon}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:15}}>{sec.label}</div>
+            <div style={S.muted}>{sec.sub}</div>
+            {sec.done!==null&&<div style={{...S.bar,margin:"6px 0 0",height:4}}><div style={S.fill(Math.round(sec.done/sec.total*100))}/></div>}
+          </div>
+          <div style={{color:"#b0bec5",fontSize:20}}>›</div>
+        </div>
+      ))}
+
+      {/* Notifications */}
+      <div style={S.card({background:notifEnabled?"linear-gradient(135deg,#1b5e2033,#4caf5022)":"rgba(255,255,255,0.04)",borderColor:notifEnabled?"#4caf5055":"rgba(255,255,255,0.08)"})}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{fontSize:22}}>{notifEnabled?"🔔":"🔕"}</div>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:13}}>{notifEnabled?"Promemoria attivi ✅":"Attiva i promemoria giornalieri"}</div>
+            <div style={S.muted}>{notifEnabled?"Ti avvisiamo ogni giorno!":"Non dimenticare di studiare!"}</div>
+          </div>
+          {!notifEnabled&&<button style={S.btn(undefined,{fontSize:12,padding:"7px 14px"})} onClick={enableNotifications}>Attiva</button>}
+        </div>
+      </div>
+      <div style={{...S.center,...S.muted,marginTop:8,fontSize:12}}>Fatto con 💙 per Emanuela</div>
+    </div>
+    {overlays}
+    </div>
+  );
+
+  // ── QUIZ PICK ─────────────────────────────────────────────────
+  if(screen==="quizPick") return(
+    <div style={S.app}><div style={S.wrap}>
+      <button style={S.back} onClick={()=>setScreen("home")}>← Home</button>
+      <div style={{...S.center,padding:"20px 0 24px"}}>
+        <div style={{fontSize:44}}>🎮</div>
+        <div style={{...S.gtxt,marginTop:4}}>Scegli la modalità</div>
+      </div>
+      {[
+        {lbl:"🇬🇧 → 🇮🇹  Normale",sub:"Vedi la parola inglese, scegli l'italiano",xp:"+10 XP per risposta",col:"#3949ab",fn:()=>startQuiz(10,false,false)},
+        {lbl:"🇮🇹 → 🇬🇧  Inverso ⚡",sub:"Vedi l'italiano, scegli l'inglese — più difficile!",xp:"⚡ XP doppio!",col:"#6a1b9a",fn:()=>startQuiz(10,true,false)},
+      ].map((m,i)=>(
+        <div key={i} style={S.card({background:`linear-gradient(135deg,${m.col}44,${m.col}22)`,marginBottom:16})}>
+          <div style={{fontWeight:700,fontSize:16,marginBottom:4}}>{m.lbl}</div>
+          <div style={{...S.muted,marginBottom:10}}>{m.sub}</div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{color:"#ffd54f",fontSize:13}}>{m.xp}</span>
+            <button style={S.btn()} onClick={m.fn}>Inizia!</button>
+          </div>
+        </div>
+      ))}
+      <div style={S.card({background:dailyDone?"rgba(255,255,255,0.03)":"linear-gradient(135deg,#bf360c44,#ff6f0022)",borderColor:dailyDone?"rgba(255,255,255,0.06)":"#ff6f0055"})}>
+        <div style={{fontWeight:700,fontSize:16,marginBottom:4}}>{dailyDone?"✅ Sfida del Giorno — Completata!":"🔥 Sfida del Giorno"}</div>
+        <div style={{...S.muted,marginBottom:10}}>{dailyDone?"Hai già fatto la sfida oggi. Torna domani!":"5 domande · XP doppio · una sola volta al giorno!"}</div>
+        {!dailyDone&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span style={{color:"#ff6f00",fontSize:13}}>⚡ +20 XP per risposta!</span>
+          <button style={S.btn("linear-gradient(135deg,#e65100,#ff6f00)")} onClick={()=>startQuiz(5,false,true)}>Sfida!</button>
+        </div>}
+      </div>
+    </div></div>
+  );
+
+  // ── ACHIEVEMENTS ──────────────────────────────────────────────
+  if(screen==="achievements") return(
+    <div style={S.app}><div style={S.wrap}>
+      <button style={S.back} onClick={()=>setScreen("home")}>← Home</button>
+      <div style={{...S.center,padding:"16px 0 20px"}}>
+        <div style={{fontSize:40}}>🏆</div>
+        <div style={S.gtxt}>I Tuoi Badge</div>
+        <div style={S.muted}>{achievements.size}/{ACHIEVEMENTS.length} sbloccati</div>
+        <div style={{...S.bar,width:"80%",margin:"10px auto 0"}}>
+          <div style={S.fill(Math.round(achievements.size/ACHIEVEMENTS.length*100))}/>
+        </div>
+      </div>
+      {ACHIEVEMENTS.map(a=>{
+        const u=achievements.has(a.id);
+        return(
+          <div key={a.id} style={S.card({background:u?"linear-gradient(135deg,#4a148c44,#7c4dff22)":"rgba(255,255,255,0.03)",borderColor:u?"#7c4dff55":"rgba(255,255,255,0.06)",display:"flex",gap:16,alignItems:"center",opacity:u?1:0.5})}>
+            <div style={{fontSize:34,filter:u?"none":"grayscale(1)"}}>{a.icon}</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:14}}>{a.title}</div>
+              <div style={S.muted}>{a.desc}</div>
+              {!u&&<div style={{...S.muted,fontSize:11,marginTop:2}}>🔒 Non ancora sbloccato</div>}
+            </div>
+            {u&&<div style={{marginLeft:"auto",fontSize:18}}>✅</div>}
+          </div>
+        );
+      })}
+    </div></div>
+  );
+
+  // ── CRYSTAL ───────────────────────────────────────────────────
+  if(screen==="crystal"){
+    const c=CRYSTALS[crystalI],w=c.words[wordI];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <button style={S.back} onClick={()=>{setScreen("home");setWordI(0);setFlipped(false);}}>← Home</button>
+        <div style={S.center}>
+          <div style={{fontSize:52,marginBottom:4}}>{c.emoji}</div>
+          <div style={S.gtxt}>{c.it}</div>
+          <div style={{...S.muted,fontStyle:"italic",marginTop:2}}>{c.name}</div>
+        </div>
+        <div style={S.card({background:"linear-gradient(135deg,#1a237e44,#4a148c33)",borderColor:"#7c4dff55",margin:"14px 0"})}>
+          <div style={{fontSize:17,marginBottom:8}}>🌙 Consiglio Lunare</div>
+          <div style={{fontSize:13,color:"#e1bee7",lineHeight:1.7}}>{c.lunar}</div>
+          <div style={{fontSize:12,color:"#7986cb",marginTop:8,fontStyle:"italic"}}>🇬🇧 "{c.lunarEn}"</div>
+        </div>
+        <div style={{...S.center,...S.muted,marginBottom:8}}>Parola {wordI+1} di {c.words.length}</div>
+        <div
+          onClick={()=>doFlip(setFlipped,setFlipping,()=>{setFlipped(true);learnWord(w.en);})}
+          style={S.card({background:flipped?"linear-gradient(135deg,#1b5e2088,#4caf5044)":"linear-gradient(135deg,#1a237e88,#3949ab44)",...S.center,padding:28,minHeight:150,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:flipped?"default":"pointer",transform:flipping?"scaleX(0.05)":"scaleX(1)",transition:"transform 0.16s ease"})}>
+          <div style={{fontSize:28,fontWeight:800,marginBottom:4}}>{w.en}</div>
+          {!flipped?(<><button onClick={e=>{e.stopPropagation();speak(w.en);}} style={S.spk}>🔊 Ascolta</button><div style={{color:"#90caf9",fontSize:13,marginTop:4}}>Tocca la card per scoprire! 👆</div></>)
+          :(<><button onClick={e=>{e.stopPropagation();speak(w.en);}} style={S.spk}>🔊 Ascolta ancora</button><div style={{fontSize:22,fontWeight:800,color:"#a5d6a7",margin:"6px 0"}}>{w.it}</div><div style={{fontSize:13,color:"#b0bec5",fontStyle:"italic",lineHeight:1.7}}>"{w.ex}"</div><div style={{marginTop:8,fontSize:18}}>✅ +5 XP!</div></>)}
+        </div>
+        <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap",marginBottom:20}}>
+          {wordI>0&&<button style={S.soft()} onClick={()=>{setWordI(i=>i-1);setFlipped(false);}}>← Prec</button>}
+          {wordI<c.words.length-1?<button style={S.btn()} onClick={()=>{setWordI(i=>i+1);setFlipped(false);}}>Prossima →</button>
+          :<button style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)")} onClick={()=>{setScreen("home");setWordI(0);setFlipped(false);}}>🌟 Completato!</button>}
+        </div>
+        <div style={{...S.center,...S.muted,marginBottom:8,fontSize:12}}>Esplora tutti i cristalli:</div>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",justifyContent:"center"}}>
+          {CRYSTALS.map((cr,i)=>(
+            <button key={i} onClick={()=>{setCrystalI(i);setWordI(0);setFlipped(false);}}
+              style={{background:i===crystalI?"rgba(124,77,255,0.3)":"rgba(255,255,255,0.06)",border:`1px solid ${i===crystalI?"#7c4dff":"rgba(255,255,255,0.1)"}`,borderRadius:10,padding:"7px 10px",color:"#fff",fontSize:12,cursor:"pointer"}}>
+              {cr.emoji} {cr.it}
+            </button>
+          ))}
+        </div>
+      </div>{overlays}</div>
+    );
+  }
+
+  // ── ZODIAC ────────────────────────────────────────────────────
+  if(screen==="zodiac"){
+    const z=ZODIAC[zodiacI];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <button style={S.back} onClick={()=>setScreen("home")}>← Home</button>
+        <div style={S.center}>
+          <div style={{fontSize:52}}>{z.emoji}</div>
+          {z.isEmanuela&&<div style={{background:"linear-gradient(135deg,#7c4dff,#e040fb)",borderRadius:20,padding:"4px 14px",fontSize:12,fontWeight:700,display:"inline-block",marginBottom:6}}>✨ Il tuo segno, Emanuela!</div>}
+          <div style={S.gtxt}>{z.it}</div>
+          <div style={{color:"#90caf9",fontStyle:"italic",marginTop:2}}>{z.sign}</div>
+          <div style={{...S.muted,marginTop:4}}>{z.dates} · {z.element}</div>
+          <button onClick={()=>speak(z.sign)} style={{...S.spk,marginTop:8}}>🔊 Come si pronuncia</button>
+        </div>
+        {z.deep&&<div style={S.card({background:"linear-gradient(135deg,#1a237e33,#4a148c22)",margin:"14px 0"})}>
+          <div style={{fontSize:13,color:"#e1bee7",lineHeight:1.8}}>{z.deep}</div>
+          <div style={{fontSize:12,color:"#7986cb",marginTop:8,fontStyle:"italic",lineHeight:1.6}}>🇬🇧 {z.deepEn}</div>
+        </div>}
+        {z.planet&&<div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:12})}>
+          <div style={S.muted}>Pianeta 🪐</div>
+          <div style={{fontWeight:700,fontSize:15,marginTop:4,color:"#ffd54f"}}>{z.planet}</div>
+          <div style={{...S.muted,marginTop:4,fontStyle:"italic"}}>🇬🇧 {z.planetEn}</div>
+        </div>}
+        <div style={S.card({background:"linear-gradient(135deg,#1a237e44,#4a148c33)",marginBottom:12})}>
+          <div style={{fontWeight:700,marginBottom:12}}>🌟 Caratteristiche in inglese</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {z.traits.map((t,i)=>(
+              <div key={i} onClick={()=>speak(t)} style={{background:"rgba(124,77,255,0.2)",border:"1px solid #7c4dff55",borderRadius:20,padding:"7px 14px",cursor:"pointer"}}>
+                <div style={{fontWeight:700,fontSize:13}}>{t} 🔊</div>
+                <div style={{color:"#b0bec5",fontSize:11}}>{z.itTraits[i]}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{...S.muted,fontSize:11,marginTop:10}}>Tocca per sentire la pronuncia!</div>
+        </div>
+        {z.shadowTraits&&<div style={S.card({background:"rgba(255,255,255,0.03)",marginBottom:12})}>
+          <div style={{fontWeight:700,marginBottom:10,color:"#b0bec5"}}>🌑 Lato ombra (da lavorare)</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {z.shadowTraits.map((t,i)=>(
+              <div key={i} onClick={()=>speak(t)} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:20,padding:"6px 12px",cursor:"pointer"}}>
+                <div style={{fontSize:12,color:"#b0bec5"}}>{t} 🔊 · {z.shadowIt[i]}</div>
+              </div>
+            ))}
+          </div>
+        </div>}
+        {z.compatible&&<div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:12})}>
+          <div style={S.muted}>💕 Segni compatibili</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:8}}>
+            {z.compatible.map((c,i)=><span key={i} style={{background:"rgba(244,143,177,0.2)",border:"1px solid #f48fb155",borderRadius:16,padding:"5px 12px",fontSize:13}}>{c}</span>)}
+          </div>
+        </div>}
+        {z.celebrities&&<div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:12})}>
+          <div style={S.muted}>⭐ Sagittari famosi</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:8}}>
+            {z.celebrities.map((c,i)=><span key={i} style={{background:"rgba(124,77,255,0.15)",border:"1px solid #7c4dff44",borderRadius:16,padding:"5px 12px",fontSize:12}}>{c}</span>)}
+          </div>
+        </div>}
+        <div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:12})}>
+          <div style={S.muted}>💡 Parola del segno</div>
+          <div style={{fontSize:13,color:"#e1bee7",marginTop:6,lineHeight:1.7}}>{z.tip}</div>
+          {z.powerWord&&<div style={{fontSize:12,color:"#b0bec5",marginTop:6,lineHeight:1.7}}>{z.powerWord}</div>}
+        </div>
+        <div style={{...S.card({background:"rgba(255,255,255,0.04)"}),display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+          <div><div style={S.muted}>Il tuo cristallo 💎</div><div style={{fontWeight:700,fontSize:17,marginTop:2}}>{z.crystal}</div></div>
+          <button style={S.btn(undefined,{fontSize:13,padding:"9px 18px"})} onClick={()=>{addXP(5);markStudied();}}>Lo conosco! +5 XP</button>
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+          {ZODIAC.map((zz,i)=>(
+            <button key={i} onClick={()=>setZodiacI(i)}
+              style={{background:i===zodiacI?"rgba(124,77,255,0.3)":"rgba(255,255,255,0.06)",border:`1px solid ${i===zodiacI?"#7c4dff":"rgba(255,255,255,0.1)"}`,borderRadius:12,padding:"10px 4px",color:"#fff",fontSize:11,cursor:"pointer",textAlign:"center",position:"relative"}}>
+              <div style={{fontSize:18}}>{zz.emoji}</div><div>{zz.it}</div>
+              {zz.isEmanuela&&<div style={{position:"absolute",top:2,right:4,fontSize:8,color:"#f48fb1"}}>♐</div>}
+            </button>
+          ))}
+        </div>
+      </div></div>
+    );
+  }
+
+  // ── FACTS ─────────────────────────────────────────────────────
+  if(screen==="facts"){
+    const f=FACTS[factI],w=f.words[factWordI];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <button style={S.back} onClick={()=>{setScreen("home");setFactWordI(0);setFactFlipped(false);}}>← Home</button>
+        <div style={{overflowX:"auto",display:"flex",gap:8,marginBottom:16,paddingBottom:4}}>
+          {FACTS.map((ff,i)=>(
+            <button key={i} onClick={()=>{setFactI(i);setFactWordI(0);setFactFlipped(false);}}
+              style={{flexShrink:0,background:i===factI?"rgba(124,77,255,0.3)":"rgba(255,255,255,0.06)",border:`1px solid ${i===factI?"#7c4dff":"rgba(255,255,255,0.1)"}`,borderRadius:12,padding:"10px 14px",color:"#fff",fontSize:20,cursor:"pointer"}}>
+              {ff.emoji}
+            </button>
+          ))}
+        </div>
+        <div style={S.center}>
+          <div style={S.gtxt}>{f.title}</div>
+          <div style={{color:"#90caf9",fontStyle:"italic",fontSize:14,marginTop:2}}>{f.titleEn}</div>
+        </div>
+        <div style={S.card({background:"linear-gradient(135deg,#0d47a144,#1b5e2033)",margin:"14px 0"})}>
+          <div style={{fontSize:13,color:"#e3f2fd",lineHeight:1.8}}>{f.fact}</div>
+          <div style={{fontSize:12,color:"#7986cb",marginTop:8,fontStyle:"italic",lineHeight:1.6}}>🇬🇧 {f.factEn}</div>
+        </div>
+        <div style={{...S.center,...S.muted,marginBottom:8}}>Parola {factWordI+1} di {f.words.length}</div>
+        <div
+          onClick={()=>doFlip(setFactFlipped,setFactFlipping,()=>{setFactFlipped(true);learnWord(w.en);})}
+          style={S.card({background:factFlipped?"linear-gradient(135deg,#1b5e2088,#4caf5044)":"linear-gradient(135deg,#0d47a188,#1565c044)",...S.center,padding:28,minHeight:130,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:factFlipped?"default":"pointer",transform:factFlipping?"scaleX(0.05)":"scaleX(1)",transition:"transform 0.16s ease"})}>
+          <div style={{fontSize:24,fontWeight:800,marginBottom:4}}>{w.en}</div>
+          {!factFlipped?(<><button onClick={e=>{e.stopPropagation();speak(w.en);}} style={S.spk}>🔊 Ascolta</button><div style={{color:"#90caf9",fontSize:13,marginTop:4}}>Tocca per tradurre! 👆</div></>)
+          :(<><button onClick={e=>{e.stopPropagation();speak(w.en);}} style={S.spk}>🔊 Ascolta ancora</button><div style={{fontSize:20,fontWeight:800,color:"#a5d6a7",margin:"4px 0"}}>{w.it}</div><div style={{fontSize:13,color:"#b0bec5",fontStyle:"italic",marginTop:4}}>"{w.ex}"</div><div style={{marginTop:8,fontSize:18}}>✅ +5 XP!</div></>)}
+        </div>
+        <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+          {factWordI>0&&<button style={S.soft()} onClick={()=>{setFactWordI(i=>i-1);setFactFlipped(false);}}>← Prec</button>}
+          {factWordI<f.words.length-1?<button style={S.btn()} onClick={()=>{setFactWordI(i=>i+1);setFactFlipped(false);}}>Prossima →</button>
+          :<button style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)")} onClick={()=>{setScreen("home");setFactWordI(0);setFactFlipped(false);}}>🌟 Completato!</button>}
+        </div>
+      </div>{overlays}</div>
+    );
+  }
+
+  // ── TV QUIZ PICK ──────────────────────────────────────────────
+  if(screen==="tvQuizPick"){
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <button style={S.back} onClick={()=>setScreen("tv")}>← Serie TV</button>
+        <div style={{...S.gtxt,fontSize:22,fontWeight:800,marginBottom:6,marginTop:20}}>🎬 Quiz Serie TV</div>
+        <div style={{...S.muted,marginBottom:24,textAlign:"center"}}>Scegli come giocare</div>
+        <div style={{display:"flex",flexDirection:"column",gap:14}}>
+          <button style={{...S.card({background:"linear-gradient(135deg,#1a0533,#0d1b4b)"}),...S.center,padding:28,cursor:"pointer",border:"1px solid rgba(124,77,255,0.3)",textAlign:"center",width:"100%"}} onClick={()=>startTVQuiz('show')}>
+            <div style={{fontSize:40,marginBottom:10}}>📺</div>
+            <div style={{fontWeight:800,fontSize:18,marginBottom:6,color:"#fff"}}>Indovina la Serie</div>
+            <div style={{...S.muted,fontSize:13}}>Leggi la frase e indovina da quale serie viene</div>
+          </button>
+          <button style={{...S.card({background:"linear-gradient(135deg,#1a0533,#0d1b4b)"}),...S.center,padding:28,cursor:"pointer",border:"1px solid rgba(224,64,251,0.3)",textAlign:"center",width:"100%"}} onClick={()=>startTVQuiz('translate')}>
+            <div style={{fontSize:40,marginBottom:10}}>🇮🇹</div>
+            <div style={{fontWeight:800,fontSize:18,marginBottom:6,color:"#fff"}}>Traduci la Frase</div>
+            <div style={{...S.muted,fontSize:13}}>Scegli la traduzione italiana giusta</div>
+          </button>
+        </div>
+      </div></div>
+    );
+  }
+
+  // ── TV ────────────────────────────────────────────────────────
+  if(screen==="tv"){
+    const show=TV[tvI],phrase=show.phrases[tvPI];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <button style={S.back} onClick={()=>{setScreen("home");setTvPI(0);setTvRev(false);}}>← Home</button>
+          <button style={{...S.btn("linear-gradient(135deg,#7c4dff,#e040fb)"),padding:"8px 16px",fontSize:13}} onClick={()=>setScreen("tvQuizPick")}>🎬 Quiz</button>
+        </div>
+        <div style={{display:"flex",gap:8,marginBottom:20,overflowX:"auto",paddingBottom:4}}>
+          {TV.map((s,i)=>(
+            <button key={i} onClick={()=>{setTvI(i);setTvPI(0);setTvRev(false);}}
+              style={{flexShrink:0,background:i===tvI?"rgba(124,77,255,0.3)":"rgba(255,255,255,0.06)",border:`1px solid ${i===tvI?"#7c4dff":"rgba(255,255,255,0.1)"}`,borderRadius:12,padding:"10px 12px",color:"#fff",fontSize:12,cursor:"pointer",fontWeight:i===tvI?700:400,whiteSpace:"nowrap"}}>
+              {s.emoji} {s.show}
+            </button>
+          ))}
+        </div>
+        <div style={{...S.center,...S.muted,marginBottom:12}}>Frase {tvPI+1} di {show.phrases.length}</div>
+        <div onClick={()=>{if(!tvRev){setTvRev(true);learnWord(phrase.en);markStudied();}}}
+          style={S.card({background:tvRev?"linear-gradient(135deg,#1b5e2088,#4caf5044)":"linear-gradient(135deg,#37003044,#88005544)",...S.center,padding:28,minHeight:160,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:tvRev?"default":"pointer"})}>
+          <div style={{fontSize:19,fontWeight:800,lineHeight:1.5,marginBottom:8}}>"{phrase.en}"</div>
+          <button onClick={e=>{e.stopPropagation();speak(phrase.en);}} style={S.spk}>🔊 Ascolta</button>
+          {!tvRev?(<div style={{color:"#f48fb1",fontSize:13,marginTop:8}}>Tocca per la traduzione! 👆</div>)
+          :(<><div style={{fontSize:15,color:"#a5d6a7",marginTop:10}}>{phrase.it}</div><div style={{fontSize:12,color:"#b0bec5",marginTop:8,fontStyle:"italic",padding:"0 8px",lineHeight:1.7}}>💡 {phrase.note}</div><div style={{marginTop:8,fontSize:18}}>✅ +5 XP!</div></>)}
+        </div>
+        <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+          {tvPI>0&&<button style={S.soft()} onClick={()=>{setTvPI(i=>i-1);setTvRev(false);}}>← Prec</button>}
+          {tvPI<show.phrases.length-1?<button style={S.btn()} onClick={()=>{setTvPI(i=>i+1);setTvRev(false);}}>Prossima →</button>
+          :<button style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)")} onClick={()=>{setScreen("home");setTvPI(0);setTvRev(false);}}>🌟 Completato!</button>}
+        </div>
+      </div>{overlays}</div>
+    );
+  }
+
+  // ── QUIZ DONE ─────────────────────────────────────────────────
+  if(screen==="quiz"&&qDone){
+    const total=quiz.length,score=qScore;
+    return(
+      <><div style={S.app}><div style={{...S.wrap,...S.center,paddingTop:60,animation:"fadeIn 0.4s ease"}}>
+        <div style={{fontSize:72,marginBottom:12,animation:"pop 0.4s ease"}}>{score>=total*0.8?"🏆":score>=total*0.5?"🌟":"💪"}</div>
+        <div style={{...S.gtxt,fontSize:26,marginBottom:8}}>{score}/{total} corrette!</div>
+        <div style={{...S.muted,fontSize:15,marginBottom:8}}>
+          {score===total?"Perfetta! Sei straordinaria! 🌕":score>=total*0.8?"Ottimo lavoro! Quasi perfetta!":score>=total*0.5?"Bene! Continua così!":"Riprova — ci stai arrivando!"}
+        </div>
+        {qDaily&&<div style={{background:"linear-gradient(135deg,#bf360c44,#ff6f0022)",border:"1px solid #ff6f0055",borderRadius:16,padding:"12px 20px",marginBottom:12,fontSize:14,color:"#ff6f00",fontWeight:700}}>🔥 Sfida del Giorno completata! +{score*20} XP guadagnati!</div>}
+        {!qDaily&&<div style={{fontSize:22,color:"#ffd54f",marginBottom:24}}>+{score*(qRev?20:10)} XP guadagnati!</div>}
+        <div style={{display:"flex",flexDirection:"column",gap:12,alignItems:"center",marginTop:16}}>
+          <button style={S.btn()} onClick={()=>tvQuizMode?startTVQuiz(tvQuizMode):startQuiz(quiz.length,qRev,false)}>🔄 Rigioca</button>
+          <button style={S.soft()} onClick={()=>{if(tvQuizMode){setTvQuizMode(null);setScreen("tvQuizPick");}else setScreen("quizPick");}}>Cambia modalità</button>
+          <button style={S.soft()} onClick={()=>{setTvQuizMode(null);setScreen("home");}}>← Torna alla Home</button>
+        </div>
+      </div></div>{overlays}</>
+    );
+  }
+
+  // ── QUIZ ──────────────────────────────────────────────────────
+  if(screen==="quiz"&&quiz){
+    const q=quiz[qStep];
+    const question=tvQuizMode?q.en:(qRev?q.it:q.en);
+    const speakQ=q.en;
+    const qLabel=tvQuizMode==='show'?"Di quale serie è questa frase?":tvQuizMode==='translate'?"Cosa vuol dire in italiano?":qRev?"Come si dice in inglese?":"Come si dice in italiano?";
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"20px 0 12px"}}>
+          <button style={S.back} onClick={()=>tvQuizMode?setScreen("tvQuizPick"):setScreen("quizPick")}>← Modalità</button>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            {qDaily&&<span style={{background:"rgba(255,111,0,0.2)",border:"1px solid #ff6f00",borderRadius:10,padding:"3px 8px",fontSize:11,color:"#ff6f00"}}>🔥 Sfida</span>}
+            {qRev&&<span style={{background:"rgba(124,77,255,0.2)",border:"1px solid #7c4dff",borderRadius:10,padding:"3px 8px",fontSize:11,color:"#b39ddb"}}>⚡ Inverso</span>}
+            {tvQuizMode&&<span style={{background:"rgba(224,64,251,0.2)",border:"1px solid #e040fb",borderRadius:10,padding:"3px 8px",fontSize:11,color:"#e040fb"}}>🎬 TV</span>}
+            <div style={{color:"#ffd54f",fontWeight:700}}>{qStep+1}/{quiz.length} · {qScore} ✅</div>
+          </div>
+        </div>
+        <div style={S.bar}><div style={S.fill((qStep/quiz.length)*100)}/></div>
+        <div style={{...S.center,padding:"24px 0 8px"}}>
+          <div style={S.muted}>{qLabel}</div>
+          <div style={{fontSize:tvQuizMode?17:28,fontWeight:800,marginTop:8,marginBottom:4,lineHeight:1.4,fontStyle:tvQuizMode?"italic":"normal"}}>
+            {tvQuizMode?`"${question}"`:question}
+          </div>
+          {tvQuizMode!=='show'&&<button onClick={()=>speak(speakQ)} style={S.spk}>🔊 Ascolta</button>}
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:8}}>
+          {q.options.map((opt,i)=>{
+            let val,isCorrect,isSel;
+            if(tvQuizMode==='show'){
+              val=`${opt.showEmoji} ${opt.show}`;
+              isCorrect=opt.show===q.show;
+              isSel=qAns&&qAns.show===opt.show;
+            } else if(tvQuizMode==='translate'){
+              val=opt.it;
+              isCorrect=opt.it===q.it;
+              isSel=qAns&&qAns.it===opt.it;
+            } else {
+              val=qRev?opt.en:opt.it;
+              isCorrect=val===(qRev?q.en:q.it);
+              isSel=qAns&&(qRev?qAns.en:qAns.it)===val;
+            }
+            let bg="rgba(255,255,255,0.06)",bd="rgba(255,255,255,0.12)";
+            if(qAns){if(isCorrect){bg="rgba(76,175,80,0.3)";bd="#4caf50";}else if(isSel){bg="rgba(244,67,54,0.3)";bd="#f44336";}}
+            return(<button key={i} onClick={()=>handleAns(opt)}
+              style={{background:bg,border:`2px solid ${bd}`,borderRadius:16,padding:"16px 8px",color:"#fff",fontSize:tvQuizMode==='show'?13:13,fontWeight:600,cursor:qAns?"default":"pointer",textAlign:"center",transition:"all 0.2s",lineHeight:1.4}}>
+              {val}
+            </button>);
+          })}
+        </div>
+      </div>{overlays}</div>
+    );
+  }
+
+  // ── PROVERBI ─────────────────────────────────────────────────
+  if(screen==="proverbi"){
+    const p=PROVERBS[provI],w=p.words[provWordI];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <button style={S.back} onClick={()=>{setScreen("home");setProvI(0);setProvWordI(0);setProvWordFlipped(false);}}>← Home</button>
+        <div style={S.center}>
+          <div style={{fontSize:44,marginBottom:4}}>🤌</div>
+          <div style={S.gtxt}>Detti Napoletani</div>
+          <div style={{...S.muted,marginTop:2}}>Proverbio {provI+1} di {PROVERBS.length}</div>
+        </div>
+
+        <div style={S.card({background:"linear-gradient(135deg,#bf360c88,#e6510066)",borderColor:"#ff6f0055",margin:"14px 0"})}>
+          <div style={{...S.muted,fontSize:11,marginBottom:8}}>🇬🇧 In inglese</div>
+          <div style={{fontSize:17,fontWeight:800,lineHeight:1.6,marginBottom:10,color:"#fff"}}>"{p.en}"</div>
+          <button onClick={()=>speak(p.en)} style={S.spk}>🔊 Ascolta</button>
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.15)",marginTop:14,paddingTop:12}}>
+            <div style={{...S.muted,fontSize:11,marginBottom:4}}>🗺️ In napoletano</div>
+            <div style={{fontSize:14,color:"#ffd54f",fontStyle:"italic",lineHeight:1.7}}>"{p.nap}"</div>
+          </div>
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.15)",marginTop:12,paddingTop:12}}>
+            <div style={{...S.muted,fontSize:11,marginBottom:4}}>🇮🇹 In italiano</div>
+            <div style={{fontSize:14,color:"#b0bec5",lineHeight:1.7}}>"{p.it}"</div>
+          </div>
+        </div>
+
+        <div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:12})}>
+          <div style={{...S.muted,fontSize:11,marginBottom:6}}>💡 Cosa significa</div>
+          <div style={{fontSize:13,color:"#e3f2fd",lineHeight:1.8}}>{p.meaning}</div>
+          <div style={{fontSize:12,color:"#7986cb",marginTop:8,fontStyle:"italic",lineHeight:1.6}}>🇬🇧 {p.meaningEn}</div>
+        </div>
+
+        <div style={{...S.center,...S.muted,marginBottom:8,fontSize:12}}>📚 Parole dal proverbio · {provWordI+1}/{p.words.length}</div>
+        <div
+          onClick={()=>{if(!provWordFlipped&&!provWordFlipping){setProvWordFlipping(true);setTimeout(()=>{setProvWordFlipped(true);learnWord(w.en);setProvWordFlipping(false);},160);}}}
+          style={S.card({background:provWordFlipped?"linear-gradient(135deg,#1b5e2088,#4caf5044)":"linear-gradient(135deg,#bf360c44,#e6510033)",...S.center,padding:24,minHeight:120,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:provWordFlipped?"default":"pointer",transform:provWordFlipping?"scaleX(0.05)":"scaleX(1)",transition:"transform 0.16s ease"})}>
+          <div style={{fontSize:22,fontWeight:800,marginBottom:4}}>{w.en}</div>
+          {!provWordFlipped
+            ?(<><button onClick={e=>{e.stopPropagation();speak(w.en);}} style={S.spk}>🔊 Ascolta</button><div style={{color:"#ffccbc",fontSize:13,marginTop:4}}>Tocca per scoprire! 👆</div></>)
+            :(<><button onClick={e=>{e.stopPropagation();speak(w.en);}} style={S.spk}>🔊 Ascolta ancora</button><div style={{fontSize:18,fontWeight:800,color:"#a5d6a7",margin:"4px 0"}}>{w.it}</div><div style={{fontSize:12,color:"#b0bec5",fontStyle:"italic",marginTop:4}}>"{w.ex}"</div><div style={{marginTop:8,fontSize:16}}>✅ +5 XP!</div></>)}
+        </div>
+
+        <div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:16}}>
+          {provWordI>0&&<button style={S.soft()} onClick={()=>{setProvWordI(i=>i-1);setProvWordFlipped(false);}}>← Prec</button>}
+          {provWordI<p.words.length-1
+            ?<button style={S.btn()} onClick={()=>{setProvWordI(i=>i+1);setProvWordFlipped(false);}}>Parola successiva →</button>
+            :<div style={{...S.muted,fontSize:12,...S.center}}>✅ Hai imparato tutte le parole!</div>}
+        </div>
+
+        <div style={{display:"flex",gap:10,justifyContent:"center"}}>
+          {provI>0&&<button style={S.soft()} onClick={()=>{setProvI(i=>i-1);setProvWordI(0);setProvWordFlipped(false);}}>← Proverbio prec.</button>}
+          {provI<PROVERBS.length-1
+            ?<button style={S.btn("linear-gradient(135deg,#e65100,#ff6f00)")} onClick={()=>{setProvI(i=>i+1);setProvWordI(0);setProvWordFlipped(false);}}>Prossimo proverbio →</button>
+            :<button style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)")} onClick={()=>{setScreen("home");setProvI(0);setProvWordI(0);setProvWordFlipped(false);}}>🌟 Completato!</button>}
+        </div>
+      </div>{overlays}</div>
+    );
+  }
+
+  // ── CHAT ──────────────────────────────────────────────────────
+  if(screen==="chat") return(
+    <div style={{...S.app,display:"flex",flexDirection:"column",height:"100vh",maxHeight:"100vh"}}>
+      <div style={{background:"linear-gradient(135deg,#1a0533,#0d1b4b)",padding:"14px 16px",borderBottom:"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+        <button style={{...S.back,marginBottom:0}} onClick={()=>setScreen("home")}>← Home</button>
+        <div style={{flex:1,display:"flex",alignItems:"center",gap:10}}>
+          <img src="Luna_AI_assistant.png" style={{width:40,height:40,borderRadius:"50%",objectFit:"cover",flexShrink:0,border:"2px solid rgba(124,77,255,0.6)"}} alt="Luna"/>
+          <div>
+            <div style={{fontWeight:700,fontSize:15}}>Luna, la tua tutor</div>
+            <div style={{...S.muted,fontSize:11}}>AI · scrivi in italiano o in inglese!</div>
+          </div>
+        </div>
+        <button onClick={()=>setTtsEnabled(t=>!t)} style={{background:ttsEnabled?"rgba(0,150,136,0.3)":"rgba(255,255,255,0.08)",border:`1px solid ${ttsEnabled?"#00bcd4":"rgba(255,255,255,0.15)"}`,borderRadius:20,padding:"6px 12px",color:"#fff",fontSize:12,cursor:"pointer",whiteSpace:"nowrap"}}>
+          {ttsEnabled?"🔊 Voce ON":"🔇 Voce OFF"}
+        </button>
+      </div>
+
+      <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:12}}>
+        {chatMessages.length===0&&(
+          <div style={{animation:"fadeIn 0.4s ease"}}>
+            <div style={{background:"rgba(0,105,92,0.25)",border:"1px solid rgba(0,188,212,0.3)",borderRadius:"4px 20px 20px 20px",padding:"14px 16px",maxWidth:"88%",marginBottom:16}}>
+              <div style={{fontSize:13,lineHeight:1.9,color:"#e0f2f1"}}>
+                🌙 Ciao Emanuela! Sono <strong>Luna</strong>, la tua tutor di inglese!<br/><br/>
+                Scrivimi <strong>in italiano</strong> e ti aiuto a dirlo in inglese, oppure prova <strong>direttamente in inglese</strong> — correggo io con gentilezza. Puoi anche usare il 🎤 microfono!
+              </div>
+            </div>
+            <div style={{...S.muted,fontSize:12,marginBottom:10}}>💡 Da dove vuoi iniziare?</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+              {[
+                "Come si dice 'luna piena' in inglese?",
+                "Parliamo di cristalli 💎",
+                "Aiutami col mio segno ♐",
+                "Voglio fare conversazione!",
+                "Spiegami una parola che non capisco",
+                "Parliamo di Bridgerton 🌹",
+              ].map((s,i)=>(
+                <button key={i} onClick={()=>handleSend(s)}
+                  style={{background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:20,padding:"8px 14px",color:"#b0bec5",fontSize:12,cursor:"pointer"}}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {chatMessages.map((m,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",alignItems:"flex-end",gap:8}}>
+            {m.role==="assistant"&&<img src="Luna_AI_assistant.png" style={{width:28,height:28,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt="Luna"/>}
+            <div style={{
+              background:m.role==="user"?"linear-gradient(135deg,#7c4dff,#e040fb)":"rgba(255,255,255,0.07)",
+              border:m.role==="user"?"none":"1px solid rgba(255,255,255,0.12)",
+              borderRadius:m.role==="user"?"20px 4px 20px 20px":"4px 20px 20px 20px",
+              padding:"12px 16px",maxWidth:"88%",
+              fontSize:13,lineHeight:1.85,color:"#fff",whiteSpace:"pre-wrap",wordBreak:"break-word",
+            }}>{m.content}</div>
+          </div>
+        ))}
+
+        {chatLoading&&(
+          <div style={{display:"flex",justifyContent:"flex-start"}}>
+            <div style={{background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:"4px 20px 20px 20px",padding:"12px 16px",color:"#b0bec5",fontSize:13}}>
+              Luna sta scrivendo ✨
+            </div>
+          </div>
+        )}
+        <div ref={chatBottomRef}/>
+      </div>
+
+      <div style={{background:"rgba(13,2,33,0.97)",borderTop:"1px solid rgba(255,255,255,0.1)",padding:"12px 16px",display:"flex",gap:10,alignItems:"flex-end",flexShrink:0}}>
+        <textarea
+          value={chatInput}
+          onChange={e=>setChatInput(e.target.value)}
+          onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}}}
+          placeholder="Scrivi in italiano o in inglese..."
+          rows={1}
+          style={{flex:1,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:16,padding:"10px 14px",color:"#fff",fontSize:14,resize:"none",outline:"none",fontFamily:"system-ui,sans-serif",lineHeight:1.5,maxHeight:100,overflowY:"auto"}}
+        />
+        <button onClick={startListening}
+          style={{background:listening?"rgba(244,67,54,0.3)":"rgba(255,255,255,0.08)",border:`1px solid ${listening?"#f44336":"rgba(255,255,255,0.15)"}`,borderRadius:14,padding:"10px 12px",color:listening?"#ef9a9a":"#b0bec5",fontSize:18,cursor:"pointer",flexShrink:0}}>
+          🎤
+        </button>
+        <button onClick={()=>handleSend()} disabled={!chatInput.trim()||chatLoading}
+          style={{background:"linear-gradient(135deg,#00695c,#00bcd4)",border:"none",borderRadius:14,padding:"10px 18px",color:"#fff",fontSize:16,fontWeight:700,cursor:"pointer",flexShrink:0,opacity:chatInput.trim()&&!chatLoading?1:0.4}}>
+          ➤
+        </button>
+      </div>
+    </div>
+  );
+
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
