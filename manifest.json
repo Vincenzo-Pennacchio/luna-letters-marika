@@ -1,11 +1,11 @@
 {
-  "name": "Luna & Letters",
-  "short_name": "Luna & Letters",
-  "description": "Il tuo viaggio in inglese",
+  "name": "Luna & Letters · Marika",
+  "short_name": "Luna · Marika",
+  "description": "Il viaggio di Marika in inglese",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d0221",
-  "theme_color": "#7c4dff",
+  "background_color": "#0a0e27",
+  "theme_color": "#1976d2",
   "orientation": "portrait",
   "icons": [
     {
