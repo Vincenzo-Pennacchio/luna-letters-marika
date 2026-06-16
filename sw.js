@@ -1,4 +1,4 @@
-const CACHE = "luna-letters-marika-v3";
+const CACHE = "luna-letters-marika-v4";
 const ASSETS = ["./", "./index.html"];
 
 self.addEventListener("install", e =>

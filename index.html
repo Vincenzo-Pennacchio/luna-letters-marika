@@ -1160,6 +1160,8 @@ function App(){
   if(screen==="dialogues"){
     const d=DIALOGUES[dialogueI];
     const line=d.lines[dialogueLineI];
+    const speakerA=(d.lines.find(l=>l.who==="A")||{}).label||"A";
+    const speakerB=(d.lines.find(l=>l.who==="B")||{}).label||"B";
     const isLastLine=dialogueLineI===d.lines.length-1;
     const isAlreadyCompleted=completedDialogues.has(d.id);
     return(
@@ -1181,7 +1183,7 @@ function App(){
                 style={{background:isActive?"linear-gradient(135deg,#1976d2,#42a5f5)":isDone?"rgba(76,175,80,0.18)":"rgba(255,255,255,0.06)",
                   border:`1px solid ${isActive?"#42a5f5":isDone?"#4caf5066":"rgba(255,255,255,0.12)"}`,
                   borderRadius:14,padding:"8px 12px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
-                {dlg.icon} {dlg.title}{isDone&&" ✓"}
+                {dlg.emoji} {dlg.title}{isDone&&" ✓"}
               </button>
             );
           })}
@@ -1190,25 +1192,25 @@ function App(){
         {/* Header del dialogo corrente */}
         <div style={S.card({background:"linear-gradient(135deg,#0d47a166,#1976d244)",borderColor:"#42a5f555",margin:"10px 0 14px"})}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-            <span style={{fontSize:32}}>{d.icon}</span>
+            <span style={{fontSize:32}}>{d.emoji}</span>
             <div style={{flex:1}}>
               <div style={{fontSize:18,fontWeight:800,color:"#fff"}}>{d.title}</div>
               <div style={{...S.muted,fontSize:12,marginTop:2}}>📍 {d.setting}</div>
             </div>
           </div>
-          <div style={{...S.muted,fontSize:11,marginTop:4}}>Battuta {dialogueLineI+1} di {d.lines.length} · {d.speakers.A} ↔ {d.speakers.B}</div>
+          <div style={{...S.muted,fontSize:11,marginTop:4}}>Battuta {dialogueLineI+1} di {d.lines.length} · {speakerA} ↔ {speakerB}</div>
           <div style={{...S.bar,marginTop:8}}><div style={S.fill(((dialogueLineI+1)/d.lines.length)*100)}/></div>
         </div>
 
         {/* Bolla del dialogo */}
-        <div style={{display:"flex",justifyContent:line.speaker==="A"?"flex-start":"flex-end",marginBottom:14,animation:"fadeIn 0.3s ease"}}>
+        <div style={{display:"flex",justifyContent:line.who==="A"?"flex-start":"flex-end",marginBottom:14,animation:"fadeIn 0.3s ease"}}>
           <div style={{maxWidth:"88%",
-            background:line.speaker==="A"?"linear-gradient(135deg,#1565c044,#1976d233)":"linear-gradient(135deg,#4a148c44,#7b1fa233)",
-            border:`1px solid ${line.speaker==="A"?"#42a5f555":"#ba68c855"}`,
-            borderRadius:line.speaker==="A"?"4px 22px 22px 22px":"22px 4px 22px 22px",
+            background:line.who==="A"?"linear-gradient(135deg,#1565c044,#1976d233)":"linear-gradient(135deg,#4a148c44,#7b1fa233)",
+            border:`1px solid ${line.who==="A"?"#42a5f555":"#ba68c855"}`,
+            borderRadius:line.who==="A"?"4px 22px 22px 22px":"22px 4px 22px 22px",
             padding:"14px 18px"}}>
-            <div style={{fontSize:11,fontWeight:700,color:line.speaker==="A"?"#90caf9":"#ce93d8",marginBottom:6,letterSpacing:0.5}}>
-              {line.speaker==="A"?`👤 ${d.speakers.A}`:`👤 ${d.speakers.B}`}
+            <div style={{fontSize:11,fontWeight:700,color:line.who==="A"?"#90caf9":"#ce93d8",marginBottom:6,letterSpacing:0.5}}>
+              👤 {line.label}
             </div>
             <div style={{fontSize:16,fontWeight:700,lineHeight:1.55,color:"#fff",marginBottom:8}}>"{line.en}"</div>
             <button onClick={()=>speak(line.en)} style={S.spk}>🔊 Ascolta</button>
@@ -1250,12 +1252,11 @@ function App(){
         <div style={S.card({background:"rgba(255,255,255,0.04)",marginBottom:14})}>
           <div style={{fontSize:13,fontWeight:800,marginBottom:10,color:"#ffd54f"}}>📚 Parole chiave di questo dialogo</div>
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            {d.keyWords.map((kw,i)=>(
+            {d.key.map((kw,i)=>(
               <div key={i} style={{background:"rgba(255,255,255,0.05)",borderRadius:12,padding:"10px 12px",display:"flex",alignItems:"center",gap:10}}>
-                <button onClick={()=>{speak(kw.en);learnWord(kw.en);}} style={{...S.spk,padding:"4px 10px",flexShrink:0}}>🔊</button>
+                <button onClick={()=>{speak(kw);learnWord(kw);}} style={{...S.spk,padding:"4px 10px",flexShrink:0}}>🔊</button>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{kw.en}</div>
-                  <div style={{fontSize:12,color:"#a5d6a7"}}>→ {kw.it}</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{kw}</div>
                 </div>
               </div>
             ))}
@@ -1265,7 +1266,7 @@ function App(){
         {/* Selezione dialogo successivo veloce */}
         {dialogueI<DIALOGUES.length-1&&(
           <div style={{...S.center,...S.muted,fontSize:12,marginBottom:8}}>
-            Prossimo dialogo: <strong style={{color:"#90caf9"}}>{DIALOGUES[dialogueI+1].icon} {DIALOGUES[dialogueI+1].title}</strong>
+            Prossimo dialogo: <strong style={{color:"#90caf9"}}>{DIALOGUES[dialogueI+1].emoji} {DIALOGUES[dialogueI+1].title}</strong>
           </div>
         )}
       </div>{overlays}</div>
