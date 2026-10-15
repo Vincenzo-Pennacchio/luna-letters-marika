@@ -28,6 +28,8 @@ body{background:#0a0e27;overscroll-behavior:none;-webkit-tap-highlight-color:tra
 @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
 @keyframes screenFlash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
 @keyframes starTwinkle{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+button{touch-action:manipulation;font-family:inherit}
 </style>
 </head>
 <body>
@@ -341,6 +343,226 @@ const PROVERBS=[
    ]},
 ];
 
+// 📖 LETTURE — testi veri da leggere: storie, email, menù, cartoline, chat.
+// gloss: parole toccabili (chiave in minuscolo, come appare nel testo). quiz.a = indice della risposta giusta.
+const READINGS=[
+  {id:"sarah",emoji:"📱",format:"chat",type:"Messaggi",level:"A1",
+   title:"Messaggi con Sarah",titleEn:"Texting with Sarah",
+   intro:"Sarah, l'amica conosciuta al caffè di Londra, ti scrive per vedervi di nuovo.",
+   paras:[
+     {who:"Sarah",en:"Hi Marika! It's Sarah from the café. How are you? 😊",it:"Ciao Marika! Sono Sarah, quella del caffè. Come stai? 😊"},
+     {who:"Marika",en:"Hi Sarah! I'm great, thanks. And you?",it:"Ciao Sarah! Sto benissimo, grazie. E tu?"},
+     {who:"Sarah",en:"I'm good! Are you free on Saturday morning? There is a big food market near the river.",it:"Bene! Sei libera sabato mattina? C'è un grande mercato del cibo vicino al fiume."},
+     {who:"Marika",en:"Yes, I'm free! I love food markets. What time?",it:"Sì, sono libera! Adoro i mercati del cibo. A che ora?"},
+     {who:"Sarah",en:"Let's meet at 11 at the bridge. Bring a big bag, the cheese there is amazing! 🧀",it:"Vediamoci alle 11 al ponte. Porta una borsa grande, il formaggio lì è fantastico! 🧀"},
+     {who:"Marika",en:"Perfect! I can't wait. Is it far from my hotel?",it:"Perfetto! Non vedo l'ora. È lontano dal mio hotel?"},
+     {who:"Sarah",en:"No, it's only ten minutes on foot. I'll send you the map.",it:"No, sono solo dieci minuti a piedi. Ti mando la mappa."},
+     {who:"Marika",en:"Thank you! See you on Saturday! 💙",it:"Grazie! Ci vediamo sabato! 💙"},
+     {who:"Sarah",en:"See you! Don't be late! ⏰",it:"A sabato! Non fare tardi! ⏰"},
+   ],
+   gloss:{great:"benissimo / fantastico",free:"libera / libero",morning:"mattina",market:"mercato",markets:"mercati",near:"vicino a",river:"fiume",meet:"incontrarsi / vedersi",bridge:"ponte",bring:"portare",bag:"borsa",cheese:"formaggio",amazing:"fantastico / incredibile",wait:"aspettare (I can't wait = non vedo l'ora)",far:"lontano",minutes:"minuti",foot:"piede (on foot = a piedi)",send:"mandare / inviare",map:"mappa",late:"in ritardo"},
+   phrases:[{en:"I can't wait!",it:"Non vedo l'ora!"},{en:"Are you free on Saturday?",it:"Sei libera sabato?"},{en:"Let's meet at 11.",it:"Vediamoci alle 11."},{en:"on foot",it:"a piedi"},{en:"See you!",it:"Ci vediamo! / A presto!"}],
+   quiz:[
+     {q:"When do they meet?",qIt:"Quando si vedono?",opts:["On Saturday morning","On Sunday evening","On Friday night"],a:0},
+     {q:"Where do they meet?",qIt:"Dove si incontrano?",opts:["At the café","At the hotel","At the bridge"],a:2},
+     {q:"Why must Marika bring a big bag?",qIt:"Perché Marika deve portare una borsa grande?",opts:["For her shoes","Because the cheese is amazing","Because it will rain"],a:1},
+     {q:"How far is the market from the hotel?",qIt:"Quanto dista il mercato dall'hotel?",opts:["Ten minutes on foot","One hour by bus","Five minutes by taxi"],a:0},
+   ]},
+  {id:"menu",emoji:"🍽️",format:"menu",type:"Menù",level:"A1",
+   title:"Il menù del ristorante",titleEn:"The Restaurant Menu",
+   intro:"Sei in un bistrot italiano a Londra. Leggi il menù e scegli cosa ordinare!",
+   head:{name:"Luna Bistro",place:"London"},
+   paras:[
+     {h:true,en:"Starters",it:"Antipasti"},
+     {name:"Bruschetta",en:"Toasted bread with ripe tomatoes, garlic and fresh basil.",it:"Pane tostato con pomodori maturi, aglio e basilico fresco.",price:"£7"},
+     {name:"Soup of the day",en:"Please ask your waiter.",it:"Zuppa del giorno: chiedi al tuo cameriere.",price:"£6"},
+     {h:true,en:"Main Courses",it:"Piatti principali"},
+     {name:"Carbonara",en:"Spaghetti with egg yolk, pecorino and crispy guanciale. No cream!",it:"Spaghetti con tuorlo, pecorino e guanciale croccante. Niente panna!",price:"£14"},
+     {name:"Grilled salmon",en:"Served with lemon and a green salad.",it:"Salmone alla griglia, servito con limone e insalata verde.",price:"£18"},
+     {name:"Mushroom risotto",en:"Creamy, vegetarian and gluten-free.",it:"Risotto ai funghi: cremoso, vegetariano e senza glutine.",price:"£13"},
+     {h:true,en:"Desserts",it:"Dolci"},
+     {name:"Tiramisù",en:"Homemade every morning by our Italian chef.",it:"Fatto in casa ogni mattina dal nostro chef italiano.",price:"£6"},
+     {name:"Gelato",en:"Two scoops. Choose your favourite flavour!",it:"Due palline. Scegli il tuo gusto preferito!",price:"£5"},
+     {en:"Service is not included. Please tell us about any allergies.",it:"Il servizio non è incluso. Per favore, comunicaci eventuali allergie."},
+   ],
+   gloss:{starters:"antipasti",toasted:"tostato",bread:"pane",ripe:"maturo",tomatoes:"pomodori",garlic:"aglio",fresh:"fresco",basil:"basilico",soup:"zuppa",waiter:"cameriere",courses:"portate (main courses = piatti principali)",yolk:"tuorlo",crispy:"croccante",cream:"panna",grilled:"alla griglia",salmon:"salmone",served:"servito",lemon:"limone",mushroom:"fungo",creamy:"cremoso",vegetarian:"vegetariano","gluten-free":"senza glutine",homemade:"fatto in casa",scoops:"palline (di gelato)",favourite:"preferito (inglese UK · in USA: favorite)",flavour:"gusto (inglese UK · in USA: flavor)",service:"servizio",included:"incluso",allergies:"allergie",desserts:"dolci"},
+   phrases:[{en:"Main courses",it:"Piatti principali"},{en:"Soup of the day",it:"Zuppa del giorno"},{en:"Service is not included.",it:"Il servizio non è incluso."},{en:"I'm allergic to nuts.",it:"Sono allergica alla frutta secca."}],
+   quiz:[
+     {q:"How much is the carbonara?",qIt:"Quanto costa la carbonara?",opts:["£7","£14","£18"],a:1},
+     {q:"Which main course is vegetarian?",qIt:"Quale piatto principale è vegetariano?",opts:["Mushroom risotto","Grilled salmon","Carbonara"],a:0},
+     {q:"What is the soup of the day?",qIt:"Qual è la zuppa del giorno?",opts:["Tomato soup","Onion soup","You must ask the waiter"],a:2},
+     {q:"Is service included in the price?",qIt:"Il servizio è incluso nel prezzo?",opts:["Yes, it is","No, it isn't","Only for desserts"],a:1},
+   ]},
+  {id:"puppy",emoji:"🐶",format:"story",type:"Diario",level:"A1",
+   title:"Il mio nuovo cucciolo",titleEn:"My New Puppy",
+   intro:"Una pagina di diario: oggi in famiglia è arrivato un nuovo amico a quattro zampe!",
+   paras:[
+     {h:true,en:"Dear Diary · Monday, 3rd March",it:"Caro diario · Lunedì 3 marzo"},
+     {en:"Today is a special day. We have a new puppy! His name is Totò and he is three months old.",it:"Oggi è un giorno speciale. Abbiamo un cucciolo nuovo! Si chiama Totò e ha tre mesi."},
+     {en:"He is small and furry, with big brown eyes and long ears. He loves to play with my shoes. Oh no! 👠",it:"È piccolo e peloso, con grandi occhi marroni e orecchie lunghe. Adora giocare con le mie scarpe. Oh no! 👠"},
+     {en:"In the evening we go for a walk in the park. Totò is afraid of the pigeons, but he is very brave with the cat next door!",it:"La sera andiamo a fare una passeggiata al parco. Totò ha paura dei piccioni, ma è molto coraggioso con il gatto dei vicini!"},
+     {en:"Now he is sleeping on my bed. I think I'm in love! 🐾",it:"Adesso dorme sul mio letto. Credo di essermi innamorata! 🐾"},
+   ],
+   gloss:{diary:"diario",special:"speciale",puppy:"cucciolo",name:"nome",months:"mesi",old:"vecchio (three months old = di tre mesi)",small:"piccolo",furry:"peloso",brown:"marrone",eyes:"occhi",long:"lungo",ears:"orecchie",loves:"adora",play:"giocare",shoes:"scarpe",evening:"sera",walk:"passeggiata",park:"parco",afraid:"spaventato (afraid of = avere paura di)",pigeons:"piccioni",brave:"coraggioso",cat:"gatto",door:"porta (next door = della porta accanto)",sleeping:"dorme / sta dormendo",bed:"letto",love:"amore (in love = innamorata)"},
+   phrases:[{en:"He is three months old.",it:"Ha tre mesi."},{en:"to go for a walk",it:"fare una passeggiata"},{en:"the cat next door",it:"il gatto dei vicini"},{en:"I'm in love!",it:"Sono innamorata!"}],
+   quiz:[
+     {q:"What is the puppy's name?",qIt:"Come si chiama il cucciolo?",opts:["Max","Totò","Luna"],a:1},
+     {q:"How old is he?",qIt:"Quanti mesi ha?",opts:["Three months","Three years","Three weeks"],a:0},
+     {q:"What is Totò afraid of?",qIt:"Di cosa ha paura Totò?",opts:["The cat next door","Marika's shoes","The pigeons"],a:2},
+     {q:"Where is he sleeping now?",qIt:"Dove dorme adesso?",opts:["In the garden","On Marika's bed","In the kitchen"],a:1},
+   ]},
+  {id:"hotel",emoji:"📧",format:"email",type:"Email",level:"A2",
+   title:"Email all'hotel",titleEn:"An Email to the Hotel",
+   intro:"Marika scrive un'email formale per prenotare una camera per il suo compleanno. ♐",
+   head:{from:"Marika",to:"The Blue Moon Hotel, Brighton",subject:"Room booking from 12th to 15th December",subjectIt:"Prenotazione camera dal 12 al 15 dicembre"},
+   paras:[
+     {en:"Dear Sir or Madam,",it:"Gentile Signore o Signora,"},
+     {en:"I would like to book a double room at your hotel for three nights, from 12th to 15th December. I am coming to Brighton to celebrate my birthday!",it:"Vorrei prenotare una camera doppia nel vostro hotel per tre notti, dal 12 al 15 dicembre. Vengo a Brighton per festeggiare il mio compleanno!"},
+     {en:"Could you please tell me if the room has a sea view? I would also like to know if breakfast is included in the price.",it:"Potreste dirmi se la camera ha la vista mare? Vorrei anche sapere se la colazione è inclusa nel prezzo."},
+     {en:"My train arrives at about 9 PM. Is it possible to check in late?",it:"Il mio treno arriva verso le 21. È possibile fare il check-in tardi?"},
+     {en:"Thank you in advance. I look forward to hearing from you.",it:"Grazie in anticipo. Resto in attesa di una vostra risposta."},
+     {en:"Kind regards, Marika",it:"Cordiali saluti, Marika"},
+   ],
+   gloss:{dear:"caro / gentile",madam:"signora (formale)",book:"prenotare",booking:"prenotazione",double:"doppia",room:"camera",nights:"notti",celebrate:"festeggiare",birthday:"compleanno",sea:"mare",view:"vista",breakfast:"colazione",included:"incluso",price:"prezzo",train:"treno",arrives:"arriva",possible:"possibile",late:"tardi",advance:"anticipo (in advance = in anticipo)",regards:"saluti (kind regards = cordiali saluti)"},
+   phrases:[{en:"Dear Sir or Madam,",it:"Gentile Signore o Signora, (quando non conosci il nome)"},{en:"I would like to...",it:"Vorrei..."},{en:"Could you please tell me...?",it:"Potreste dirmi...?"},{en:"I look forward to hearing from you.",it:"Resto in attesa di una vostra risposta."},{en:"Kind regards",it:"Cordiali saluti"}],
+   quiz:[
+     {q:"How many nights does Marika want to stay?",qIt:"Per quante notti vuole restare Marika?",opts:["Two","Three","Five"],a:1},
+     {q:"Why is she going to Brighton?",qIt:"Perché va a Brighton?",opts:["To celebrate her birthday","For work","To visit a friend"],a:0},
+     {q:"How is she travelling to Brighton?",qIt:"Come arriva a Brighton?",opts:["By plane","By car","By train"],a:2},
+     {q:"What does she ask about breakfast?",qIt:"Cosa chiede sulla colazione?",opts:["What time it starts","If it is included in the price","If it is Italian"],a:1},
+   ]},
+  {id:"nonna",emoji:"👵",format:"story",type:"Racconto",level:"A2",
+   title:"Il pranzo della domenica",titleEn:"Sunday Lunch at Nonna's",
+   intro:"Un racconto in cucina: il segreto della nonna per il ragù perfetto.",
+   paras:[
+     {en:"Every Sunday, Marika's grandmother cooks a big lunch for the whole family. The kitchen smells of garlic, basil and fresh tomatoes.",it:"Ogni domenica la nonna di Marika cucina un grande pranzo per tutta la famiglia. La cucina profuma di aglio, basilico e pomodori freschi."},
+     {en:"Today she is making ragù. 'The secret is time,' she says. 'You must simmer the sauce slowly for at least four hours.'",it:"Oggi prepara il ragù. 'Il segreto è il tempo,' dice. 'Devi cuocere il sugo a fuoco lento per almeno quattro ore.'"},
+     {en:"Marika stirs the pot with a wooden spoon and tastes the sauce. It is rich and delicious. 'Can I add some salt?' she asks.",it:"Marika mescola la pentola con un cucchiaio di legno e assaggia il sugo. È ricco e delizioso. 'Posso aggiungere un po' di sale?' chiede."},
+     {en:"'Just a pinch,' says her grandmother with a smile. 'Good cooking is like love. You can't rush it.'",it:"'Solo un pizzico,' dice la nonna con un sorriso. 'La buona cucina è come l'amore. Non puoi avere fretta.'"},
+     {en:"At two o'clock everybody sits at the table. There is laughter, wine and lots of pasta. Marika thinks: this is the best recipe in the world.",it:"Alle due tutti si siedono a tavola. Ci sono risate, vino e tanta pasta. Marika pensa: questa è la ricetta migliore del mondo."},
+   ],
+   gloss:{grandmother:"nonna",cooks:"cucina (cook = cucinare)",lunch:"pranzo",whole:"intero / tutto",family:"famiglia",kitchen:"cucina (la stanza)",smells:"profuma (smell = odore)",secret:"segreto",simmer:"cuocere a fuoco lento",sauce:"sugo / salsa",slowly:"lentamente",least:"(at least) almeno",hours:"ore",stirs:"mescola",pot:"pentola",wooden:"di legno",spoon:"cucchiaio",tastes:"assaggia",rich:"ricco / saporito",delicious:"delizioso",add:"aggiungere",salt:"sale",pinch:"pizzico",smile:"sorriso",rush:"avere fretta / affrettare",everybody:"tutti",laughter:"risate",wine:"vino",recipe:"ricetta"},
+   phrases:[{en:"at least",it:"almeno"},{en:"Just a pinch.",it:"Solo un pizzico."},{en:"You can't rush it.",it:"Non si può avere fretta."},{en:"The kitchen smells of garlic.",it:"La cucina profuma d'aglio."}],
+   quiz:[
+     {q:"What is the grandmother making today?",qIt:"Cosa prepara oggi la nonna?",opts:["Lasagna","Ragù","Risotto"],a:1},
+     {q:"How long must the sauce simmer?",qIt:"Per quanto tempo deve cuocere il sugo?",opts:["At least four hours","Twenty minutes","One hour"],a:0},
+     {q:"What does Marika want to add?",qIt:"Cosa vuole aggiungere Marika?",opts:["Sugar","Cream","Salt"],a:2},
+     {q:"For Nonna, good cooking is like...",qIt:"Per la nonna, la buona cucina è come...",opts:["Music","Love","A journey"],a:1},
+   ]},
+  {id:"horoscope",emoji:"♐",format:"story",type:"Oroscopo",level:"A2",
+   title:"L'oroscopo della settimana",titleEn:"Your Weekly Horoscope",
+   intro:"L'oroscopo del Sagittario, tutto in inglese. Cosa dicono le stelle per te?",
+   paras:[
+     {h:true,en:"Sagittarius ♐ · This Week",it:"Sagittario ♐ · Questa settimana"},
+     {en:"This week Jupiter, your lucky planet, brings you new energy. It is the perfect time to start something new. Maybe a new language? 😉",it:"Questa settimana Giove, il tuo pianeta fortunato, ti porta nuova energia. È il momento perfetto per iniziare qualcosa di nuovo. Magari una nuova lingua? 😉"},
+     {en:"Love: Someone is thinking about you more than you know. Be honest about your feelings, but be patient too.",it:"Amore: qualcuno pensa a te più di quanto immagini. Sii sincera sui tuoi sentimenti, ma anche paziente."},
+     {en:"Work: You have great ideas, but don't try to do everything at once. Make a list and take one step at a time.",it:"Lavoro: hai grandi idee, ma non cercare di fare tutto insieme. Fai una lista e procedi un passo alla volta."},
+     {en:"Travel: Your wanderlust is strong this week! Look at flights, plan a weekend away, or simply explore a new place in your city.",it:"Viaggi: la tua voglia di viaggiare è forte questa settimana! Guarda i voli, organizza un weekend fuori, o semplicemente esplora un posto nuovo nella tua città."},
+     {en:"Lucky color: royal blue. Lucky number: 9. Lucky day: Thursday. In Italian, giovedì means 'the day of Jupiter'!",it:"Colore fortunato: blu reale. Numero fortunato: 9. Giorno fortunato: giovedì. In italiano, giovedì significa 'il giorno di Giove'!"},
+   ],
+   gloss:{lucky:"fortunato",planet:"pianeta",brings:"porta (bring = portare)",energy:"energia",perfect:"perfetto",start:"iniziare",maybe:"forse / magari",language:"lingua",love:"amore",someone:"qualcuno",honest:"sincera / onesta",feelings:"sentimenti",patient:"paziente",work:"lavoro",ideas:"idee",once:"una volta (at once = tutto insieme)",list:"lista",step:"passo",travel:"viaggi / viaggiare",wanderlust:"voglia di viaggiare",strong:"forte",flights:"voli",plan:"organizzare / pianificare",away:"via / fuori (a weekend away = un weekend fuori)",simply:"semplicemente",explore:"esplorare",city:"città"},
+   phrases:[{en:"one step at a time",it:"un passo alla volta"},{en:"at once",it:"tutto insieme / subito"},{en:"a weekend away",it:"un weekend fuori città"},{en:"more than you know",it:"più di quanto immagini"}],
+   quiz:[
+     {q:"Which planet brings Sagittarius new energy?",qIt:"Quale pianeta porta nuova energia al Sagittario?",opts:["Venus","Mars","Jupiter"],a:2},
+     {q:"What is the advice for work?",qIt:"Qual è il consiglio per il lavoro?",opts:["Take one step at a time","Do everything at once","Take a long holiday"],a:0},
+     {q:"In love, Sagittarius should be...",qIt:"In amore, il Sagittario dovrebbe essere...",opts:["Shy and quiet","Honest and patient","Cold and distant"],a:1},
+     {q:"What is the lucky number?",qIt:"Qual è il numero fortunato?",opts:["7","3","9"],a:2},
+   ]},
+  {id:"istanbul",emoji:"🕌",format:"postcard",type:"Cartolina",level:"A2",
+   title:"Cartolina da Istanbul",titleEn:"A Postcard from Istanbul",
+   intro:"Marika è in viaggio in Turchia, la terra delle serie turche, e scrive alla mamma.",
+   head:{stamp:"🇹🇷",place:"Istanbul, Turkey",to:"Mum 💙 · Napoli, Italy"},
+   paras:[
+     {en:"Dear Mum,",it:"Cara mamma,"},
+     {en:"Greetings from Istanbul! The city is amazing: half in Europe and half in Asia. Yesterday I took a ferry on the Bosphorus at sunset. The sky was pink and orange, and the water was a beautiful teal.",it:"Saluti da Istanbul! La città è incredibile: metà in Europa e metà in Asia. Ieri ho preso un traghetto sul Bosforo al tramonto. Il cielo era rosa e arancione, e l'acqua di un bellissimo verde-azzurro."},
+     {en:"Many Turkish dramas are filmed here, and I felt like I was in an episode of DayDreamer! 💫 I visited the Grand Bazaar and bought a beautiful blue scarf for you.",it:"Molte serie turche sono girate qui, e mi sembrava di essere in un episodio di DayDreamer! 💫 Ho visitato il Gran Bazar e ho comprato una bellissima sciarpa blu per te."},
+     {en:"The food is delicious. I tried baklava and Turkish tea. Here, tea is served in small glasses, not in cups!",it:"Il cibo è delizioso. Ho assaggiato il baklava e il tè turco. Qui il tè si serve in bicchierini, non in tazze!"},
+     {en:"I miss you and your cooking. See you next week! Lots of love, Marika 💙",it:"Mi manchi tu e la tua cucina. Ci vediamo la prossima settimana! Con tanto affetto, Marika 💙"},
+   ],
+   gloss:{greetings:"saluti",amazing:"incredibile",half:"metà",yesterday:"ieri",took:"ho preso (take = prendere)",ferry:"traghetto",sunset:"tramonto",sky:"cielo",pink:"rosa",teal:"verde-azzurro",dramas:"serie drammatiche",filmed:"girato / filmato",felt:"mi sono sentita (feel = sentirsi)",episode:"episodio",visited:"ho visitato",bought:"ho comprato (buy = comprare)",scarf:"sciarpa",delicious:"delizioso",tried:"ho assaggiato (try = provare)",tea:"tè",served:"servito",glasses:"bicchieri",cups:"tazze",miss:"mancare (I miss you = mi manchi)",cooking:"cucina (il cucinare)"},
+   phrases:[{en:"Greetings from Istanbul!",it:"Saluti da Istanbul!"},{en:"I felt like I was in a film.",it:"Mi sembrava di essere in un film."},{en:"I miss you.",it:"Mi manchi."},{en:"Lots of love",it:"Con tanto affetto"}],
+   quiz:[
+     {q:"Who is the postcard for?",qIt:"A chi è indirizzata la cartolina?",opts:["Her friend Sarah","Her mum","Her grandmother"],a:1},
+     {q:"What did Marika buy at the Grand Bazaar?",qIt:"Cosa ha comprato Marika al Gran Bazar?",opts:["A blue scarf","A leather bag","A pair of shoes"],a:0},
+     {q:"How is tea served in Turkey?",qIt:"Come si serve il tè in Turchia?",opts:["In big cups","With lots of milk","In small glasses"],a:2},
+     {q:"When did she take the ferry?",qIt:"Quando ha preso il traghetto?",opts:["At sunset","Early in the morning","At midnight"],a:0},
+   ]},
+  {id:"milan",emoji:"👗",format:"story",type:"Articolo",level:"B1",
+   title:"Guida alla Fashion Week di Milano",titleEn:"Milan Fashion Week: A Beginner's Guide",
+   intro:"Un articolo di moda: come vivere la Fashion Week anche senza invito.",
+   paras:[
+     {en:"Twice a year, in February and September, Milan becomes the capital of fashion. During Fashion Week, the most famous designers show their new collections on the catwalk.",it:"Due volte all'anno, a febbraio e a settembre, Milano diventa la capitale della moda. Durante la Fashion Week, gli stilisti più famosi presentano le loro nuove collezioni in passerella."},
+     {en:"But you don't need a ticket to enjoy it! The streets are full of stylish people, and photographers take pictures of the best outfits. This is called 'street style'.",it:"Ma non serve un biglietto per godersela! Le strade sono piene di persone con stile, e i fotografi scattano foto ai look migliori. Questo si chiama 'street style'."},
+     {en:"If you love luxury, visit the Fashion Quadrilateral: four elegant streets full of designer boutiques. If your budget is smaller, try the vintage shops in the Navigli area, where you can find unique pieces at good prices.",it:"Se ami il lusso, visita il Quadrilatero della Moda: quattro strade eleganti piene di boutique firmate. Se il tuo budget è più piccolo, prova i negozi vintage nella zona dei Navigli, dove puoi trovare pezzi unici a buoni prezzi."},
+     {en:"And remember the golden rule of Italian style: less is more. A well-fitted jacket, good shoes and one statement accessory are enough to look chic.",it:"E ricorda la regola d'oro dello stile italiano: meno è meglio. Una giacca ben tagliata, buone scarpe e un accessorio d'impatto bastano per essere chic."},
+   ],
+   gloss:{twice:"due volte",capital:"capitale",fashion:"moda",during:"durante",famous:"famoso",designers:"stilisti",collections:"collezioni",catwalk:"passerella",ticket:"biglietto",enjoy:"godersi",streets:"strade",stylish:"con stile / alla moda",photographers:"fotografi",pictures:"foto",outfits:"look / completi",luxury:"lusso",elegant:"elegante",designer:"firmato / di marca",budget:"budget / disponibilità di spesa",vintage:"vintage / d'epoca",shops:"negozi",unique:"unico",pieces:"pezzi / capi",prices:"prezzi",golden:"d'oro",rule:"regola","well-fitted":"ben tagliato / che veste bene",jacket:"giacca",statement:"d'impatto (statement accessory)",accessory:"accessorio",enough:"abbastanza / sufficiente",chic:"chic / elegante"},
+   phrases:[{en:"Less is more.",it:"Meno è meglio."},{en:"street style",it:"lo stile della strada"},{en:"a statement piece",it:"un capo d'impatto"},{en:"at good prices",it:"a buoni prezzi"}],
+   quiz:[
+     {q:"How often is Milan Fashion Week?",qIt:"Ogni quanto c'è la Fashion Week di Milano?",opts:["Once a year","Twice a year","Every month"],a:1},
+     {q:"What is 'street style'?",qIt:"Che cos'è lo 'street style'?",opts:["Photos of stylish people in the street","A kind of shoe","A famous boutique"],a:0},
+     {q:"Where can you find vintage shops?",qIt:"Dove si trovano i negozi vintage?",opts:["On the catwalk","In the Fashion Quadrilateral","In the Navigli area"],a:2},
+     {q:"What is the golden rule of Italian style?",qIt:"Qual è la regola d'oro dello stile italiano?",opts:["More is more","Less is more","Always wear black"],a:1},
+   ]},
+  {id:"diamond",emoji:"💎",format:"story",type:"Racconto",level:"B1",
+   title:"Il diamante della stagione",titleEn:"The Diamond of the Season",
+   intro:"Un racconto in stile Bridgerton: una giovane napoletana al suo primo ballo a Londra. 🌹",
+   paras:[
+     {en:"London, 1813. The ballroom glittered with a thousand candles. Miss Marika Rossi, newly arrived from Naples, adjusted her royal blue gown and took a deep breath.",it:"Londra, 1813. La sala da ballo scintillava di mille candele. La signorina Marika Rossi, appena arrivata da Napoli, sistemò il suo abito blu reale e fece un respiro profondo."},
+     {en:"Every eye in the room turned towards her. 'Who is she?' whispered the ladies behind their fans. Even the Queen raised her eyebrows with interest.",it:"Tutti gli sguardi della sala si voltarono verso di lei. 'Chi è?' sussurravano le dame dietro i ventagli. Perfino la Regina alzò le sopracciglia con interesse."},
+     {en:"A tall gentleman with dark eyes approached and bowed. 'Lord Ashford, at your service. May I have the honour of this dance?' Marika smiled. 'Indeed you may, my lord.'",it:"Un gentiluomo alto con gli occhi scuri si avvicinò e fece un inchino. 'Lord Ashford, al vostro servizio. Posso avere l'onore di questo ballo?' Marika sorrise. 'Certamente, mio signore.'"},
+     {en:"As they danced, he asked her about Italy. She told him about the sea, the lemon trees and the best pizza in the world. 'You are unlike anyone I have ever met,' he said softly.",it:"Mentre ballavano, lui le chiese dell'Italia. Lei gli raccontò del mare, degli alberi di limone e della pizza più buona del mondo. 'Siete diversa da chiunque abbia mai incontrato,' disse lui dolcemente."},
+     {en:"The next morning, the society papers had only one headline: 'The Diamond of the Season has arrived... and she is Italian!'",it:"La mattina dopo, i giornali mondani avevano un solo titolo: 'Il Diamante della Stagione è arrivato... ed è italiana!'"},
+   ],
+   gloss:{diamond:"diamante",season:"stagione",ballroom:"sala da ballo",glittered:"scintillava (glitter = scintillare)",thousand:"mille",candles:"candele",newly:"appena (newly arrived = appena arrivata)",adjusted:"sistemò",gown:"abito da sera",deep:"profondo",breath:"respiro",turned:"si voltò",towards:"verso",whispered:"sussurravano (whisper = sussurrare)",ladies:"dame / signore",fans:"ventagli",queen:"regina",raised:"alzò",eyebrows:"sopracciglia",interest:"interesse",tall:"alto",gentleman:"gentiluomo",approached:"si avvicinò",bowed:"fece un inchino",service:"servizio",honour:"onore (inglese UK · in USA: honor)",indeed:"certamente / davvero",danced:"ballavano",lemon:"limone",trees:"alberi",unlike:"diverso da",softly:"dolcemente / sottovoce",society:"alta società",papers:"giornali",headline:"titolo (di giornale)"},
+   phrases:[{en:"at your service",it:"al vostro servizio"},{en:"May I have the honour of this dance?",it:"Posso avere l'onore di questo ballo?"},{en:"Indeed you may.",it:"Certamente, potete."},{en:"You are unlike anyone I have ever met.",it:"Siete diversa da chiunque abbia mai incontrato."}],
+   quiz:[
+     {q:"Where is Miss Marika Rossi from?",qIt:"Da dove viene la signorina Marika Rossi?",opts:["London","Naples","Venice"],a:1},
+     {q:"What colour is her gown?",qIt:"Di che colore è il suo abito?",opts:["Royal blue","Gold","White"],a:0},
+     {q:"What does Lord Ashford ask her?",qIt:"Cosa le chiede Lord Ashford?",opts:["To marry him","To dance with him","To sing a song"],a:1},
+     {q:"What did the papers say the next morning?",qIt:"Cosa dicevano i giornali la mattina dopo?",opts:["The ball was boring","The Queen was angry","The Diamond of the Season has arrived"],a:2},
+   ]},
+  {id:"moon",emoji:"🌙",format:"story",type:"Articolo",level:"B1",
+   title:"Perché la Luna cambia forma?",titleEn:"Why Does the Moon Change Shape?",
+   intro:"Un breve articolo scientifico sulla Luna, con tutte le parole per descriverla.",
+   paras:[
+     {en:"Have you ever noticed that the Moon looks different every night? The Moon does not produce its own light. It reflects the light of the Sun.",it:"Hai mai notato che la Luna sembra diversa ogni notte? La Luna non produce luce propria. Riflette la luce del Sole."},
+     {en:"As the Moon travels around the Earth, we see different parts of its bright side. These are called the phases of the Moon. A full cycle takes about 29 and a half days.",it:"Mentre la Luna gira intorno alla Terra, vediamo parti diverse del suo lato illuminato. Queste si chiamano fasi lunari. Un ciclo completo dura circa 29 giorni e mezzo."},
+     {en:"When the bright part is growing, we say the Moon is waxing. When it is getting smaller, it is waning. Between the new moon and the full moon, we see a crescent and then a half moon, called the first quarter.",it:"Quando la parte luminosa cresce, diciamo che la Luna è crescente (waxing). Quando diventa più piccola, è calante (waning). Tra la luna nuova e la luna piena vediamo una falce e poi una mezza luna, chiamata primo quarto."},
+     {en:"The Moon also controls the tides. Its gravity pulls the water of the oceans, so in most places the sea goes up and down twice a day.",it:"La Luna controlla anche le maree. La sua gravità attira l'acqua degli oceani, così nella maggior parte dei luoghi il mare sale e scende due volte al giorno."},
+     {en:"So next time you look at the night sky, you can say in perfect English: 'Look, the Moon is waxing tonight!' 🌒",it:"Quindi la prossima volta che guardi il cielo notturno, puoi dire in perfetto inglese: 'Guarda, stasera la Luna è crescente!' 🌒"},
+   ],
+   gloss:{noticed:"notato (notice = notare)",different:"diverso",produce:"produrre",own:"proprio",light:"luce",reflects:"riflette",travels:"viaggia / si muove",around:"intorno a",earth:"Terra",bright:"luminoso",side:"lato",phases:"fasi",cycle:"ciclo",takes:"dura / ci vuole",growing:"crescendo (grow = crescere)",waxing:"crescente",smaller:"più piccolo",waning:"calante",crescent:"falce di luna",quarter:"quarto",controls:"controlla",tides:"maree",gravity:"gravità",pulls:"attira / tira",oceans:"oceani",twice:"due volte",sky:"cielo",tonight:"stasera"},
+   phrases:[{en:"Have you ever noticed...?",it:"Hai mai notato...?"},{en:"its own light",it:"luce propria"},{en:"twice a day",it:"due volte al giorno"},{en:"next time",it:"la prossima volta"}],
+   quiz:[
+     {q:"Does the Moon produce its own light?",qIt:"La Luna produce luce propria?",opts:["Yes, always","No, it reflects the light of the Sun","Only when it is full"],a:1},
+     {q:"How long is a full lunar cycle?",qIt:"Quanto dura un ciclo lunare completo?",opts:["About 29 and a half days","Exactly one week","One year"],a:0},
+     {q:"What does 'waning' mean?",qIt:"Cosa significa 'waning'?",opts:["Growing","Disappearing forever","Getting smaller"],a:2},
+     {q:"What does the Moon's gravity control?",qIt:"Cosa controlla la gravità della Luna?",opts:["The wind","The tides","The rain"],a:1},
+   ]},
+];
+const LEVEL_COL={A1:"#43a047",A2:"#1e88e5",B1:"#8e24aa"};
+const LEVEL_LBL={A1:"Base",A2:"Elementare",B1:"Intermedio"};
+
+// 🎲 GIOCHI — usano le parole di Ricette + Fun Facts e le frasi di Dialoghi + Serie TV
+const WORD_POOL=(()=>{
+  const m=new Map();
+  [...RECIPES,...FACTS].forEach(g=>g.words.forEach(w=>{if(!m.has(w.en)&&!w.it.includes('⚠️'))m.set(w.en,{...w,topic:g.emoji});}));
+  return[...m.values()];
+})();
+const SENTENCE_POOL=[
+  ...DIALOGUES.flatMap(d=>d.lines.map(l=>({en:l.en,it:l.it,src:d.emoji}))),
+  ...TV.flatMap(s=>s.phrases.map(p=>({en:p.en,it:p.it,src:s.emoji}))),
+].filter(s=>{const n=s.en.split(/\s+/).length;return n>=4&&n<=9&&!s.en.includes('—')&&!s.en.includes('...');});
+const SCRAMBLE_ROUNDS=8,BUILDER_ROUNDS=6,DICT_ROUNDS=8,SPEED_TIME=60;
+const GAMES=[
+  {id:"memory",icon:"🧠",label:"Memory delle Parole",sub:"Abbina inglese e italiano · 6 coppie",col:"#1976d2",lower:true,fmt:v=>`🏅 Record: ${v} mosse`},
+  {id:"scramble",icon:"🔤",label:"Lettere Mescolate",sub:"Riordina le lettere · indizio in italiano",col:"#6a1b9a",fmt:v=>`🏅 Record: ${v}/${SCRAMBLE_ROUNDS}`},
+  {id:"builder",icon:"🧩",label:"Costruisci la Frase",sub:"Frasi dai dialoghi e dalle serie TV",col:"#00838f",fmt:v=>`🏅 Record: ${v}/${BUILDER_ROUNDS}`},
+  {id:"dictation",icon:"🎧",label:"Ascolta e Scrivi",sub:"Dettato · allena orecchio e ortografia",col:"#ad1457",fmt:v=>`🏅 Record: ${v}/${DICT_ROUNDS}`},
+  {id:"speed",icon:"⚡",label:"Vero o Falso Lampo",sub:`${SPEED_TIME} secondi · quante ne indovini?`,col:"#e65100",fmt:v=>`🏅 Record: ${v} risposte`},
+];
+
 const LEVELS=[
   {name:"Principiante",icon:"🌱",max:50},
   {name:"Esploratrice",icon:"🌿",max:150},
@@ -363,10 +585,18 @@ const ACHIEVEMENTS=[
   {id:"false_friend",icon:"🚨",title:"Amica dei False Friends!",desc:"Hai imparato i false friends più insidiosi!"},
   {id:"first_dialogue",icon:"💬",title:"Primo Dialogo!",desc:"Hai completato il tuo primo dialogo in inglese!"},
   {id:"all_dialogues",icon:"🎭",title:"Regina dei Dialoghi!",desc:"Hai completato tutti i dialoghi — leggendaria!"},
+  {id:"first_game",icon:"🎲",title:"Prima Partita!",desc:"Hai giocato il tuo primo gioco di parole!"},
+  {id:"all_games",icon:"🕹️",title:"Giocatrice Completa!",desc:"Hai provato tutti e 5 i giochi!"},
+  {id:"memory_pro",icon:"🐘",title:"Memoria d'Elefante!",desc:"Memory completato in 10 mosse o meno!"},
+  {id:"speed_20",icon:"⚡",title:"Fulmine!",desc:"20 risposte giuste in Vero o Falso Lampo!"},
+  {id:"sentence_perfect",icon:"🧩",title:"Architetta di Frasi!",desc:"Tutte le frasi giuste al primo colpo!"},
+  {id:"first_reading",icon:"📖",title:"Prima Lettura!",desc:"Hai letto il tuo primo testo in inglese!"},
+  {id:"perfect_reading",icon:"🎯",title:"Lettrice Attenta!",desc:"Tutte le risposte giuste su una lettura!"},
+  {id:"all_readings",icon:"📚",title:"Topo di Biblioteca!",desc:"Hai letto tutti i testi — sei una vera 'bookworm'!"},
 ];
 
 const MOON=["🌑","🌒","🌓","🌔","🌕"];
-const NOTIF_MSGS=["Ciao Marika! 🌙 Pronta per una lezione?","Luna & Letters ti aspetta! ✨ Oggi nuove parole.","Buongiorno! 🍝 Una ricetta in inglese ti aspetta.","È ora di studiare! 🌹 Bridgerton vibes attivate.","Ciao Marika! ⭐ Una nuova parola al giorno fa miracoli.","Hey! ♐ Sagittario — l'avventura ti chiama!","La tua luna cresce! 🌒 Continua così.","Marika! ✈️ Un nuovo dialogo in inglese ti aspetta."];
+const NOTIF_MSGS=["Ciao Marika! 🌙 Pronta per una lezione?","Luna & Letters ti aspetta! ✨ Oggi nuove parole.","Buongiorno! 🍝 Una ricetta in inglese ti aspetta.","È ora di studiare! 🌹 Bridgerton vibes attivate.","Ciao Marika! ⭐ Una nuova parola al giorno fa miracoli.","Hey! ♐ Sagittario — l'avventura ti chiama!","La tua luna cresce! 🌒 Continua così.","Marika! ✈️ Un nuovo dialogo in inglese ti aspetta.","Marika! 🎲 Una partita a Memory in inglese?","📖 Una nuova lettura in inglese ti aspetta!"];
 
 function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
 function getLevel(xp){return LEVELS.find(l=>xp<l.max)||LEVELS[LEVELS.length-1];}
@@ -378,6 +608,45 @@ function getLevelProgress(xp){
 }
 function getWordOfDay(all){return all[Math.floor(Date.now()/86400000)%all.length];}
 function todayStr(){return new Date().toDateString();}
+function cheer(score,total){return score===total?"Perfetta! Sei straordinaria! 🌕":score>=total*0.7?"Bravissima, quasi perfetta!":score>=total*0.4?"Bene, continua così!":"Riprova — ci stai arrivando! 💪";}
+
+// Regex unicode costruite a runtime (Babel non le tocca) con fallback per browser vecchi
+let EMOJI_RE=null,WORD_RE=/^([^A-Za-zÀ-ÿ]*)(.*?)([^A-Za-zÀ-ÿ]*)$/;
+try{EMOJI_RE=new RegExp("[\\p{Extended_Pictographic}\\u{1F1E6}-\\u{1F1FF}\\uFE0F\\u200D]","gu");}catch{}
+try{WORD_RE=new RegExp("^([^\\p{L}]*)(.*?)([^\\p{L}]*)$","u");}catch{}
+function ttsClean(t){return EMOJI_RE?t.replace(EMOJI_RE,''):t;}
+
+function speak(text,rate=0.82){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(ttsClean(text));
+  u.lang='en-US';u.rate=rate;window.speechSynthesis.speak(u);
+}
+function speakAll(texts,rate=0.82){
+  if(!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  texts.forEach(t=>{const u=new SpeechSynthesisUtterance(ttsClean(t));u.lang='en-US';u.rate=rate;window.speechSynthesis.speak(u);});
+}
+function stopSpeaking(){try{window.speechSynthesis&&window.speechSynthesis.cancel();}catch{}}
+
+function playSound(ok){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    if(ok){
+      o.type='sine';o.frequency.value=523;
+      g.gain.setValueAtTime(0.18,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+      o.start();o.stop(ctx.currentTime+0.5);
+    }else{
+      o.type='square';o.frequency.value=160;
+      g.gain.setValueAtTime(0.1,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.22);
+      o.start();o.stop(ctx.currentTime+0.22);
+    }
+  }catch{}
+}
 
 // 💙 Palette: blu dominante (colore preferito di Marika) + oro stelle
 const S={
@@ -415,6 +684,723 @@ function Confetti(){
   );
 }
 
+// ── GIOCHI: componenti condivisi ──────────────────────────────────────────────
+// Ogni gioco riceve kit={addXP,markStudied,learnWord,unlockAch,learned}, onExit e onFinish(score).
+function GameTop({icon,title,onExit,right}){
+  return(
+    <>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:16}}>
+        <button style={{...S.back,marginBottom:0}} onClick={()=>{stopSpeaking();onExit();}}>← Giochi</button>
+        {right&&<div style={{color:"#ffd54f",fontWeight:700,fontSize:14}}>{right}</div>}
+      </div>
+      <div style={{...S.center,margin:"10px 0 12px"}}>
+        <div style={{fontSize:36}}>{icon}</div>
+        <div style={{...S.gtxt,fontSize:22}}>{title}</div>
+      </div>
+    </>
+  );
+}
+
+function GameOver({emoji,title,msg,xp,onReplay,onExit,children}){
+  return(
+    <div style={{...S.center,paddingTop:48,animation:"fadeIn 0.4s ease"}}>
+      <div style={{fontSize:68,marginBottom:10,animation:"pop 0.4s ease"}}>{emoji}</div>
+      <div style={{...S.gtxt,fontSize:26,marginBottom:8}}>{title}</div>
+      {msg&&<div style={{...S.muted,fontSize:15,marginBottom:8}}>{msg}</div>}
+      {xp>0&&<div style={{fontSize:22,color:"#ffd54f",margin:"8px 0 20px"}}>+{xp} XP guadagnati!</div>}
+      {children}
+      <div style={{display:"flex",flexDirection:"column",gap:12,alignItems:"center",marginTop:12}}>
+        <button style={S.btn()} onClick={onReplay}>🔄 Rigioca</button>
+        <button style={S.soft()} onClick={onExit}>← Torna ai Giochi</button>
+      </div>
+    </div>
+  );
+}
+
+const chipStyle=on=>({background:on?"linear-gradient(135deg,#00838f,#26c6da)":"rgba(255,255,255,0.1)",border:on?"1px solid transparent":"1px solid rgba(255,255,255,0.22)",borderRadius:12,padding:"9px 14px",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer"});
+
+// ── 🧠 MEMORY ─────────────────────────────────────────────────────────────────
+function dealMemory(){
+  const picked=[],seen=new Set();
+  for(const w of shuffle(WORD_POOL)){
+    if(picked.length>=6) break;
+    if(seen.has(w.it)||w.en.length>16||w.it.length>22) continue;
+    seen.add(w.it);picked.push(w);
+  }
+  return shuffle(picked.flatMap((w,i)=>[{pair:i,lang:"en",text:w.en},{pair:i,lang:"it",text:w.it}]));
+}
+
+function MemoryGame({kit,onExit,onFinish}){
+  const[cards,setCards]=useState(dealMemory);
+  const[open,setOpen]=useState([]);
+  const[matched,setMatched]=useState([]);
+  const[moves,setMoves]=useState(0);
+  const[miss,setMiss]=useState(false);
+  const[xp,setXp]=useState(null);
+  const pairs=cards.length/2;
+
+  function restart(){setCards(dealMemory());setOpen([]);setMatched([]);setMoves(0);setMiss(false);setXp(null);}
+  function tap(i){
+    const c=cards[i];
+    if(open.length>=2||open.includes(i)||matched.includes(c.pair)) return;
+    if(c.lang==="en") speak(c.text);
+    const now=[...open,i];
+    setOpen(now);
+    if(now.length<2) return;
+    const m=moves+1;setMoves(m);
+    const[a,b]=now.map(k=>cards[k]);
+    if(a.pair===b.pair){
+      playSound(true);
+      const nm=[...matched,a.pair];
+      setTimeout(()=>{
+        setMatched(nm);setOpen([]);
+        if(nm.length===pairs){
+          const gain=20+(m<=10?10:0);
+          kit.addXP(gain);setXp(gain);onFinish(m);
+          if(m<=10) kit.unlockAch("memory_pro");
+        }
+      },500);
+    }else{
+      playSound(false);setMiss(true);
+      setTimeout(()=>{setOpen([]);setMiss(false);},1100);
+    }
+  }
+
+  if(xp!==null) return(
+    <GameOver emoji={moves<=10?"🐘":"🌟"} title={`Completato in ${moves} mosse!`}
+      msg={moves<=10?"Memoria d'elefante! Bonus +10 XP":"Prova a farcela in 10 mosse o meno!"}
+      xp={xp} onReplay={restart} onExit={onExit}/>
+  );
+  return(
+    <>
+      <GameTop icon="🧠" title="Memory delle Parole" onExit={onExit} right={`${moves} mosse · ${matched.length}/${pairs}`}/>
+      <div style={{...S.center,...S.muted,marginBottom:14}}>Trova le coppie inglese 🇬🇧 ↔ italiano 🇮🇹</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
+        {cards.map((c,i)=>{
+          const isM=matched.includes(c.pair),isO=open.includes(i),up=isM||isO;
+          let bg="linear-gradient(135deg,#0d47a1,#1976d2)",bd="rgba(144,202,249,0.35)";
+          if(up) bg=c.lang==="en"?"linear-gradient(135deg,#1565c066,#42a5f533)":"linear-gradient(135deg,#4a148c66,#7b1fa233)";
+          if(isM){bg="linear-gradient(135deg,#1b5e2088,#4caf5044)";bd="#4caf50";}
+          else if(isO&&miss) bd="#f44336";
+          return(
+            <button key={i} onClick={()=>tap(i)}
+              style={{minHeight:88,borderRadius:16,border:`2px solid ${bd}`,background:bg,color:"#fff",padding:"8px 6px",fontSize:13,fontWeight:700,lineHeight:1.3,cursor:up?"default":"pointer",animation:isO?"pop 0.25s ease":"none",wordBreak:"break-word"}}>
+              {up?(<><div style={{fontSize:10,opacity:0.7,marginBottom:3}}>{c.lang==="en"?"🇬🇧":"🇮🇹"}</div>{c.text}</>):<span style={{fontSize:26}}>🌙</span>}
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+// ── 🔤 LETTERE MESCOLATE ──────────────────────────────────────────────────────
+function scrambleTiles(en){
+  const l=en.toLowerCase().split("");
+  let sh=shuffle(l),t=0;
+  while(sh.join("")===l.join("")&&t++<20) sh=shuffle(l);
+  return sh.map((ch,id)=>({id,ch}));
+}
+
+function ScrambleGame({kit,onExit,onFinish}){
+  const pick=()=>shuffle(WORD_POOL.filter(w=>/^[a-z]{4,9}$/i.test(w.en))).slice(0,SCRAMBLE_ROUNDS);
+  const[words,setWords]=useState(pick);
+  const[step,setStep]=useState(0);
+  const[tiles,setTiles]=useState(()=>scrambleTiles(words[0].en));
+  const[ans,setAns]=useState([]);
+  const[status,setStatus]=useState(null); // ok | bad | skip
+  const[hinted,setHinted]=useState(false);
+  const[score,setScore]=useState(0);
+  const[xp,setXp]=useState(0);
+  const[done,setDone]=useState(false);
+  const w=words[step],target=w.en.toLowerCase();
+  const busy=status!==null;
+
+  function load(ws,i){setTiles(scrambleTiles(ws[i].en));setAns([]);setStatus(null);setHinted(false);}
+  function restart(){const ws=pick();setWords(ws);setStep(0);setScore(0);setXp(0);setDone(false);load(ws,0);}
+  function next(sc){
+    if(step+1>=words.length){setDone(true);onFinish(sc);return;}
+    setStep(step+1);load(words,step+1);
+  }
+  function place(na,usedHint){
+    setAns(na);
+    if(na.length<target.length) return;
+    if(na.map(id=>tiles[id].ch).join("")===target){
+      const gain=(hinted||usedHint)?5:10;
+      setStatus("ok");playSound(true);speak(w.en);
+      kit.addXP(gain);setXp(x=>x+gain);setScore(score+1);
+      setTimeout(()=>next(score+1),1500);
+    }else{
+      setStatus("bad");playSound(false);
+      setTimeout(()=>{setAns([]);setStatus(null);},800);
+    }
+  }
+  function tapTile(id){if(busy||ans.includes(id)) return;place([...ans,id],false);}
+  function undo(){if(!busy) setAns(a=>a.slice(0,-1));}
+  function hint(){
+    if(busy) return;
+    let p=0;
+    while(p<ans.length&&tiles[ans[p]].ch===target[p]) p++;
+    const keep=ans.slice(0,p);
+    const t=tiles.find(t=>t.ch===target[p]&&!keep.includes(t.id));
+    if(!t) return;
+    setHinted(true);
+    place([...keep,t.id],true);
+  }
+  function skip(){if(busy) return;setStatus("skip");speak(w.en);setTimeout(()=>next(score),1800);}
+
+  if(done) return(
+    <GameOver emoji={score>=6?"🏆":score>=4?"🌟":"💪"} title={`${score}/${words.length} parole!`}
+      msg={cheer(score,words.length)} xp={xp} onReplay={restart} onExit={onExit}/>
+  );
+  const slotCol=status==="ok"?"#4caf50":status==="bad"?"#f44336":status==="skip"?"#ffd54f":"rgba(144,202,249,0.4)";
+  return(
+    <>
+      <GameTop icon="🔤" title="Lettere Mescolate" onExit={onExit} right={`${step+1}/${words.length} · ${score} ✅`}/>
+      <div style={S.bar}><div style={S.fill(step/words.length*100)}/></div>
+      <div style={S.card({...S.center,margin:"14px 0"})}>
+        <div style={S.muted}>Indizio 🇮🇹</div>
+        <div style={{fontSize:20,fontWeight:800,color:"#a5d6a7",marginTop:4}}>{w.topic} {w.it}</div>
+        <div style={{...S.muted,fontSize:12,marginTop:4}}>{target.length} lettere</div>
+      </div>
+      <div style={{display:"flex",justifyContent:"center",gap:5,flexWrap:"wrap",marginBottom:20,animation:status==="bad"?"shake 0.4s":"none"}}>
+        {target.split("").map((ch,i)=>{
+          const letter=status==="skip"?ch:(ans[i]!==undefined?tiles[ans[i]].ch:"");
+          return <div key={i} style={{width:36,height:46,borderRadius:10,border:`2px solid ${slotCol}`,background:letter?"rgba(255,255,255,0.1)":"rgba(255,255,255,0.03)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,textTransform:"uppercase"}}>{letter}</div>;
+        })}
+      </div>
+      <div style={{display:"flex",justifyContent:"center",gap:8,flexWrap:"wrap",marginBottom:18}}>
+        {tiles.map(t=>{
+          const used=ans.includes(t.id);
+          return(
+            <button key={t.id} onClick={()=>tapTile(t.id)} disabled={used}
+              style={{width:44,height:48,borderRadius:12,border:"none",background:used?"rgba(255,255,255,0.05)":"linear-gradient(135deg,#6a1b9a,#ab47bc)",color:used?"transparent":"#fff",fontSize:22,fontWeight:800,textTransform:"uppercase",cursor:used?"default":"pointer",boxShadow:used?"none":"0 3px 0 #4a148c"}}>
+              {t.ch}
+            </button>
+          );
+        })}
+      </div>
+      {status==="ok"&&<div style={{...S.center,color:"#a5d6a7",fontWeight:800,fontSize:18,marginBottom:12}}>✅ {w.en} · +{hinted?5:10} XP</div>}
+      {status==="skip"&&<div style={{...S.center,color:"#ffd54f",fontWeight:700,marginBottom:12}}>La parola era: {w.en}</div>}
+      <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+        <button style={S.soft()} onClick={undo}>⌫ Cancella</button>
+        <button style={S.soft()} onClick={hint}>💡 Aiuto</button>
+        <button style={S.soft()} onClick={skip}>⏭ Salta</button>
+      </div>
+      <div style={{...S.center,...S.muted,fontSize:11,marginTop:14}}>Senza aiuto +10 XP · con aiuto +5 XP</div>
+    </>
+  );
+}
+
+// ── 🧩 COSTRUISCI LA FRASE ────────────────────────────────────────────────────
+function builderChips(en){
+  const toks=en.split(/\s+/),idx=toks.map((_,i)=>i);
+  let order=shuffle(idx),t=0;
+  while(order.every((v,i)=>v===i)&&t++<20) order=shuffle(idx);
+  return order.map(i=>({id:i,t:toks[i]}));
+}
+
+function BuilderGame({kit,onExit,onFinish}){
+  const pick=()=>shuffle(SENTENCE_POOL).slice(0,BUILDER_ROUNDS);
+  const[items,setItems]=useState(pick);
+  const[step,setStep]=useState(0);
+  const[chips,setChips]=useState(()=>builderChips(items[0].en));
+  const[placed,setPlaced]=useState([]);
+  const[tries,setTries]=useState(0);
+  const[status,setStatus]=useState(null); // ok | bad | shown
+  const[score,setScore]=useState(0);
+  const[perfect,setPerfect]=useState(0);
+  const[xp,setXp]=useState(0);
+  const[done,setDone]=useState(false);
+  const it=items[step];
+  const locked=status==="ok"||status==="shown";
+  const word=id=>chips.find(c=>c.id===id).t;
+
+  function load(list,i){setChips(builderChips(list[i].en));setPlaced([]);setTries(0);setStatus(null);}
+  function restart(){const l=pick();setItems(l);setStep(0);setScore(0);setPerfect(0);setXp(0);setDone(false);load(l,0);}
+  function add(id){if(locked||placed.includes(id)) return;setPlaced([...placed,id]);if(status==="bad")setStatus(null);}
+  function remove(id){if(locked) return;setPlaced(placed.filter(x=>x!==id));if(status==="bad")setStatus(null);}
+  function check(){
+    if(locked||placed.length<chips.length) return;
+    if(placed.map(word).join(" ")===it.en){
+      const first=tries===0,gain=first?15:5;
+      setStatus("ok");playSound(true);speak(it.en);
+      kit.addXP(gain);setXp(x=>x+gain);setScore(s=>s+1);
+      if(first) setPerfect(p=>p+1);
+    }else{
+      setTries(t=>t+1);setStatus("bad");playSound(false);
+    }
+  }
+  function next(){
+    if(step+1>=items.length){
+      setDone(true);onFinish(score);
+      if(perfect===items.length) kit.unlockAch("sentence_perfect");
+      return;
+    }
+    setStep(step+1);load(items,step+1);
+  }
+
+  if(done) return(
+    <GameOver emoji={perfect===items.length?"🧩":score>=4?"🌟":"💪"} title={`${score}/${items.length} frasi!`}
+      msg={perfect===items.length?"Tutte al primo colpo! Sei un'architetta di frasi!":cheer(score,items.length)}
+      xp={xp} onReplay={restart} onExit={onExit}/>
+  );
+  const pool=chips.filter(c=>!placed.includes(c.id));
+  const lineCol=status==="ok"?"#4caf50":status==="bad"?"#f44336":status==="shown"?"#ffd54f":"rgba(144,202,249,0.4)";
+  return(
+    <>
+      <GameTop icon="🧩" title="Costruisci la Frase" onExit={onExit} right={`${step+1}/${items.length} · ${score} ✅`}/>
+      <div style={S.bar}><div style={S.fill(step/items.length*100)}/></div>
+      <div style={S.card({...S.center,margin:"14px 0"})}>
+        <div style={S.muted}>Traduci in inglese {it.src}</div>
+        <div style={{fontSize:16,fontWeight:700,color:"#a5d6a7",marginTop:6,lineHeight:1.5}}>"{it.it}"</div>
+      </div>
+      <div style={{minHeight:72,borderRadius:16,border:`2px dashed ${lineCol}`,background:"rgba(255,255,255,0.04)",padding:10,display:"flex",flexWrap:"wrap",gap:8,alignItems:"center",justifyContent:"center",marginBottom:16,animation:status==="bad"?"shake 0.4s":"none"}}>
+        {status==="shown"
+          ?<div style={{color:"#ffd54f",fontWeight:700,fontSize:16,textAlign:"center",lineHeight:1.5}}>{it.en}</div>
+          :placed.length===0
+            ?<div style={{...S.muted,fontSize:12}}>Tocca le parole qui sotto, in ordine 👇</div>
+            :placed.map(id=><button key={id} onClick={()=>remove(id)} style={chipStyle(true)}>{word(id)}</button>)}
+      </div>
+      {!locked&&<div style={{display:"flex",flexWrap:"wrap",gap:8,justifyContent:"center",marginBottom:18,minHeight:44}}>
+        {pool.map(c=><button key={c.id} onClick={()=>add(c.id)} style={chipStyle(false)}>{c.t}</button>)}
+      </div>}
+      {status==="bad"&&<div style={{...S.center,color:"#ef9a9a",fontSize:13,marginBottom:12}}>Non ancora! Tocca una parola in alto per toglierla e riprova 💪</div>}
+      {status==="ok"&&<div style={{...S.center,color:"#a5d6a7",fontWeight:800,marginBottom:12}}>✅ Perfetto! +{tries===0?15:5} XP <button onClick={()=>speak(it.en)} style={{...S.spk,margin:"0 0 0 8px"}}>🔊</button></div>}
+      {status==="shown"&&<div style={{...S.center,marginBottom:12}}><button onClick={()=>speak(it.en)} style={S.spk}>🔊 Ascolta la frase</button></div>}
+      <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+        {!locked&&<button style={{...S.btn(),opacity:placed.length===chips.length?1:0.4}} onClick={check}>✔️ Controlla</button>}
+        {!locked&&tries>=2&&<button style={S.soft()} onClick={()=>{setStatus("shown");speak(it.en);}}>👀 Soluzione</button>}
+        {locked&&<button style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)")} onClick={next}>{step+1>=items.length?"🏁 Fine":"Avanti →"}</button>}
+      </div>
+      <div style={{...S.center,...S.muted,fontSize:11,marginTop:14}}>Al primo colpo +15 XP · dopo un errore +5 XP</div>
+    </>
+  );
+}
+
+// ── 🎧 ASCOLTA E SCRIVI ───────────────────────────────────────────────────────
+const normAns=s=>s.toLowerCase().replace(/’/g,"'").replace(/[^a-z' ]/g," ").replace(/\s+/g," ").trim();
+
+function DictationGame({kit,onExit,onFinish}){
+  const canSpeak=!!window.speechSynthesis;
+  const pick=()=>shuffle(WORD_POOL.filter(w=>/^[a-z][a-z' -]{2,14}$/i.test(w.en))).slice(0,DICT_ROUNDS);
+  const[words,setWords]=useState(pick);
+  const[started,setStarted]=useState(false);
+  const[step,setStep]=useState(0);
+  const[input,setInput]=useState("");
+  const[tries,setTries]=useState(0);
+  const[status,setStatus]=useState(null); // ok | bad | reveal
+  const[score,setScore]=useState(0);
+  const[xp,setXp]=useState(0);
+  const[done,setDone]=useState(false);
+  const ref=useRef(null);
+  const w=words[step];
+  const locked=status==="ok"||status==="reveal";
+
+  function say(word,slow){if(canSpeak) speak(word.en,slow?0.5:0.8);}
+  function focus(){setTimeout(()=>{try{ref.current&&ref.current.focus();}catch{}},120);}
+  function start(){setStarted(true);say(w);focus();}
+  function restart(){const ws=pick();setWords(ws);setStep(0);setInput("");setTries(0);setStatus(null);setScore(0);setXp(0);setDone(false);setStarted(true);say(ws[0]);focus();}
+  function check(){
+    if(locked||!input.trim()) return;
+    if(normAns(input)===normAns(w.en)){
+      const gain=tries===0?10:5;
+      setStatus("ok");playSound(true);kit.addXP(gain);setXp(x=>x+gain);setScore(s=>s+1);
+    }else{
+      const t=tries+1;setTries(t);playSound(false);
+      if(t>=2){setStatus("reveal");say(w);}else setStatus("bad");
+    }
+  }
+  function next(){
+    if(step+1>=words.length){setDone(true);onFinish(score);return;}
+    const n=step+1;setStep(n);setInput("");setTries(0);setStatus(null);
+    say(words[n]);focus();
+  }
+
+  if(done) return(
+    <GameOver emoji={score>=6?"🏆":score>=4?"🌟":"💪"} title={`${score}/${words.length} parole!`}
+      msg={cheer(score,words.length)} xp={xp} onReplay={restart} onExit={onExit}/>
+  );
+  if(!started) return(
+    <>
+      <GameTop icon="🎧" title="Ascolta e Scrivi" onExit={onExit}/>
+      <div style={S.card({...S.center,padding:28})}>
+        <div style={{fontSize:48,marginBottom:10}}>🔊</div>
+        <div style={{fontWeight:700,fontSize:16,marginBottom:8}}>Alza il volume!</div>
+        <div style={{...S.muted,lineHeight:1.7,marginBottom:20}}>Sentirai {words.length} parole in inglese. Scrivile correttamente — è il modo migliore per allenare orecchio e ortografia!</div>
+        {!canSpeak&&<div style={{color:"#ffcc80",fontSize:13,marginBottom:16}}>⚠️ Questo browser non supporta la voce: vedrai la parola in italiano da tradurre.</div>}
+        <button style={S.btn()} onClick={start}>Inizia! 🎧</button>
+      </div>
+    </>
+  );
+  const pattern=w.en.split("").map(ch=>ch===" "?"  ":/[a-z]/i.test(ch)?"_":ch).join(" ");
+  const letters=w.en.replace(/[^a-z]/gi,"").length;
+  const col=status==="ok"?"#4caf50":status==="bad"?"#f44336":status==="reveal"?"#ffd54f":"rgba(144,202,249,0.4)";
+  return(
+    <>
+      <GameTop icon="🎧" title="Ascolta e Scrivi" onExit={onExit} right={`${step+1}/${words.length} · ${score} ✅`}/>
+      <div style={S.bar}><div style={S.fill(step/words.length*100)}/></div>
+      <div style={S.card({...S.center,margin:"14px 0",padding:22})}>
+        {canSpeak
+          ?<div style={{display:"flex",gap:10,justifyContent:"center",marginBottom:14}}>
+            <button onClick={()=>say(w)} style={S.btn(undefined,{fontSize:17,padding:"14px 24px"})}>🔊 Ascolta</button>
+            <button onClick={()=>say(w,true)} style={S.soft({fontSize:17})}>🐢 Lento</button>
+          </div>
+          :<div style={{fontSize:18,fontWeight:800,color:"#a5d6a7",marginBottom:12}}>🇮🇹 {w.it}</div>}
+        <div style={{fontFamily:"monospace",fontSize:20,letterSpacing:1,color:"#90caf9",marginBottom:6,wordBreak:"break-word"}}>{pattern}</div>
+        <div style={{...S.muted,fontSize:12}}>{letters} lettere</div>
+      </div>
+      <form onSubmit={e=>{e.preventDefault();locked?next():check();}}>
+        <input ref={ref} value={input} readOnly={locked}
+          onChange={e=>{setInput(e.target.value);if(status==="bad")setStatus(null);}}
+          autoCapitalize="off" autoCorrect="off" autoComplete="off" spellCheck={false}
+          placeholder="Scrivi qui in inglese..."
+          style={{width:"100%",background:"rgba(255,255,255,0.08)",border:`2px solid ${col}`,borderRadius:16,padding:"14px 16px",color:"#fff",fontSize:18,outline:"none",textAlign:"center",fontFamily:"inherit",animation:status==="bad"?"shake 0.4s":"none"}}/>
+        {status==="ok"&&<div style={{...S.center,color:"#a5d6a7",fontWeight:800,margin:"12px 0"}}>✅ Esatto! {w.en} = {w.it} · +{tries===0?10:5} XP</div>}
+        {status==="bad"&&<div style={{...S.center,color:"#ef9a9a",fontSize:13,margin:"12px 0 4px"}}>❌ Non proprio! Riprova</div>}
+        {tries>=1&&!locked&&<div style={{...S.center,color:"#ffd54f",fontSize:13,margin:"6px 0 12px"}}>💡 Inizia con «{w.en[0].toLowerCase()}» · 🇮🇹 {w.it}</div>}
+        {status==="reveal"&&<div style={{...S.center,color:"#ffd54f",fontWeight:700,margin:"12px 0"}}>La parola era: {w.en} ({w.it})</div>}
+        <div style={{display:"flex",gap:10,justifyContent:"center",marginTop:14}}>
+          {locked
+            ?<button type="submit" style={S.btn("linear-gradient(135deg,#2e7d32,#66bb6a)")}>{step+1>=words.length?"🏁 Fine":"Avanti →"}</button>
+            :<button type="submit" style={{...S.btn(),opacity:input.trim()?1:0.4}}>✔️ Controlla</button>}
+        </div>
+      </form>
+    </>
+  );
+}
+
+// ── ⚡ VERO O FALSO LAMPO ─────────────────────────────────────────────────────
+function speedCard(prevEn){
+  const rnd=()=>WORD_POOL[Math.floor(Math.random()*WORD_POOL.length)];
+  let w=rnd();
+  while(w.en===prevEn) w=rnd();
+  const truth=Math.random()<0.5;
+  let it=w.it;
+  if(!truth){let o=rnd();while(o.it===w.it) o=rnd();it=o.it;}
+  return{en:w.en,it,truth,real:w.it};
+}
+
+function SpeedGame({kit,onExit,onFinish,best}){
+  const[phase,setPhase]=useState("ready"); // ready | play | over
+  const[time,setTime]=useState(SPEED_TIME);
+  const[card,setCard]=useState(()=>speedCard());
+  const[score,setScore]=useState(0);
+  const[wrong,setWrong]=useState(0);
+  const[combo,setCombo]=useState(0);
+  const[flash,setFlash]=useState(null);
+  const[record,setRecord]=useState(best||0);
+  const[mistakes,setMistakes]=useState([]);
+  const scoreRef=useRef(0);
+
+  useEffect(()=>{
+    if(phase!=="play") return;
+    const t=setInterval(()=>setTime(s=>s-1),1000);
+    return()=>clearInterval(t);
+  },[phase]);
+  useEffect(()=>{
+    if(phase!=="play"||time>0) return;
+    setPhase("over");
+    const sc=scoreRef.current;
+    if(sc>0) kit.addXP(sc*2);
+    onFinish(sc);
+    if(sc>=20) kit.unlockAch("speed_20");
+  },[time,phase]);
+
+  function start(){
+    setRecord(best||0);scoreRef.current=0;setScore(0);setWrong(0);setCombo(0);setMistakes([]);
+    setTime(SPEED_TIME);setCard(speedCard());setPhase("play");
+  }
+  function answer(v){
+    if(phase!=="play") return;
+    const ok=v===card.truth;
+    if(ok){scoreRef.current++;setScore(scoreRef.current);setCombo(c=>c+1);}
+    else{setWrong(x=>x+1);setCombo(0);setMistakes(m=>m.some(x=>x.en===card.en)?m:[...m,card]);}
+    playSound(ok);setFlash(ok?"ok":"bad");setTimeout(()=>setFlash(null),220);
+    setCard(speedCard(card.en));
+  }
+
+  if(phase==="over") return(
+    <GameOver emoji={score>record?"🏆":score>=15?"⚡":"💪"} title={`${score} risposte giuste!`}
+      msg={score>record?"🎉 Nuovo record personale!":`Il tuo record: ${record} · errori: ${wrong}`}
+      xp={score*2} onReplay={start} onExit={onExit}>
+      {mistakes.length>0&&<div style={S.card({textAlign:"left",marginTop:4})}>
+        <div style={{fontSize:13,fontWeight:800,color:"#ffd54f",marginBottom:8}}>📚 Ripassa queste parole</div>
+        {mistakes.slice(0,8).map((m,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"6px 0"}}>
+            <button onClick={()=>speak(m.en)} style={{...S.spk,margin:0,padding:"3px 9px"}}>🔊</button>
+            <div style={{fontSize:14}}><b>{m.en}</b> <span style={{color:"#a5d6a7"}}>= {m.real}</span></div>
+          </div>
+        ))}
+      </div>}
+    </GameOver>
+  );
+  if(phase==="ready") return(
+    <>
+      <GameTop icon="⚡" title="Vero o Falso Lampo" onExit={onExit}/>
+      <div style={S.card({...S.center,padding:28})}>
+        <div style={{fontSize:48,marginBottom:10}}>⏱️</div>
+        <div style={{fontWeight:700,fontSize:16,marginBottom:8}}>{SPEED_TIME} secondi, quante ne indovini?</div>
+        <div style={{...S.muted,lineHeight:1.7,marginBottom:16}}>Vedrai una parola inglese e una traduzione. Premi <b style={{color:"#a5d6a7"}}>✅ Vero</b> se è giusta, <b style={{color:"#ef9a9a"}}>❌ Falso</b> se è sbagliata. Più veloce sei, più punti fai!</div>
+        {record>0&&<div style={{color:"#ffd54f",fontSize:14,marginBottom:16}}>🏅 Il tuo record: {record}</div>}
+        <button style={S.btn("linear-gradient(135deg,#e65100,#ff6f00)",{fontSize:17,padding:"14px 32px"})} onClick={start}>Via! ⚡</button>
+      </div>
+    </>
+  );
+  const bd=flash==="ok"?"#4caf50":flash==="bad"?"#f44336":"rgba(255,255,255,0.15)";
+  return(
+    <>
+      <GameTop icon="⚡" title="Vero o Falso Lampo" onExit={onExit} right={`⏱ ${time}s · ${score} ✅`}/>
+      <div style={S.bar}><div style={{height:"100%",width:`${time/SPEED_TIME*100}%`,background:time<=10?"linear-gradient(90deg,#e53935,#ff7043)":"linear-gradient(90deg,#ff6f00,#ffd54f)",borderRadius:10,transition:"width 1s linear"}}/></div>
+      <div style={{...S.center,height:22,margin:"8px 0",color:"#ffb74d",fontWeight:800}}>{combo>=3?`🔥 Combo x${combo}`:""}</div>
+      <div style={S.card({...S.center,padding:"30px 16px",border:`2px solid ${bd}`,transition:"border-color 0.15s",minHeight:170,display:"flex",flexDirection:"column",justifyContent:"center"})}>
+        <div style={{fontSize:28,fontWeight:800}}>{card.en}</div>
+        <div style={{...S.muted,fontSize:18,margin:"6px 0"}}>=</div>
+        <div style={{fontSize:20,fontWeight:700,color:"#90caf9"}}>{card.it}</div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        <button onClick={()=>answer(false)} style={{height:72,borderRadius:18,border:"2px solid #f44336",background:"rgba(244,67,54,0.2)",color:"#fff",fontSize:20,fontWeight:800,cursor:"pointer"}}>❌ Falso</button>
+        <button onClick={()=>answer(true)} style={{height:72,borderRadius:18,border:"2px solid #4caf50",background:"rgba(76,175,80,0.2)",color:"#fff",fontSize:20,fontWeight:800,cursor:"pointer"}}>✅ Vero</button>
+      </div>
+    </>
+  );
+}
+
+const GAME_VIEWS={memory:MemoryGame,scramble:ScrambleGame,builder:BuilderGame,dictation:DictationGame,speed:SpeedGame};
+
+// ── 📖 LETTURA ────────────────────────────────────────────────────────────────
+function Badge({col,children}){
+  return <span style={{background:col?`${col}33`:"rgba(255,255,255,0.08)",border:`1px solid ${col?col+"88":"rgba(255,255,255,0.15)"}`,color:col?"#fff":"#b3c5d7",borderRadius:10,padding:"3px 10px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>{children}</span>;
+}
+function readingMinutes(r){return Math.max(1,Math.round(r.paras.reduce((s,p)=>s+p.en.split(/\s+/).length,0)/80));}
+
+function ReadingView({r,kit,best,onBack,onFinish,onNext}){
+  const[showIt,setShowIt]=useState([]);
+  const[allIt,setAllIt]=useState(false);
+  const[slow,setSlow]=useState(false);
+  const[sheet,setSheet]=useState(null);
+  const[answers,setAnswers]=useState({});
+  const[result,setResult]=useState(null);
+  const[qs]=useState(()=>r.quiz.map(q=>({...q,order:shuffle(q.opts.map((_,i)=>i))})));
+  const rate=slow?0.6:0.82;
+  const light=r.format==="postcard";
+  useEffect(()=>stopSpeaking,[]);
+
+  const itOn=i=>allIt||showIt.includes(i);
+  const toggleIt=i=>setShowIt(s=>s.includes(i)?s.filter(x=>x!==i):[...s,i]);
+  const say=p=>p.name?`${p.name}. ${p.en}`:p.en;
+
+  // Ogni parola è toccabile: se è nel glossario apre la traduzione, altrimenti la pronuncia.
+  function words(text){
+    return text.split(/(\s+)/).map((tok,i)=>{
+      if(!tok.trim()) return tok;
+      const m=tok.match(WORD_RE);
+      const pre=m?m[1]:"",core=m?m[2]:tok,post=m?m[3]:"";
+      if(!core) return <React.Fragment key={i}>{tok}</React.Fragment>;
+      const k=core.toLowerCase(),key=r.gloss[k]?k:k.replace(/'s$/,"");
+      const g=r.gloss[key];
+      return(
+        <React.Fragment key={i}>{pre}<span
+          onClick={e=>{e.stopPropagation();speak(core,rate);if(g) setSheet({en:key,it:g});}}
+          style={g?{borderBottom:`2px dotted ${light?"#b8860b":"#ffd54f"}`,cursor:"pointer"}:{cursor:"pointer"}}>{core}</span>{post}</React.Fragment>
+      );
+    });
+  }
+
+  const tb=on=>({background:on?(light?"rgba(46,125,50,0.15)":"rgba(165,214,167,0.2)"):(light?"rgba(0,0,0,0.05)":"rgba(255,255,255,0.07)"),border:`1px solid ${light?"rgba(0,0,0,0.15)":"rgba(255,255,255,0.15)"}`,borderRadius:10,padding:"3px 10px",fontSize:12,cursor:"pointer",color:light?"#3e2723":"#fff"});
+  const tools=(i,text)=>(
+    <div style={{display:"flex",gap:6,marginTop:6}}>
+      <button onClick={()=>speak(text,rate)} style={tb(false)}>🔊</button>
+      <button onClick={()=>toggleIt(i)} style={tb(itOn(i))}>🇮🇹</button>
+    </div>
+  );
+  const itText=(p,i)=>itOn(i)&&<div style={{fontSize:13,fontStyle:"italic",color:light?"#2e7d32":"#a5d6a7",marginTop:6,lineHeight:1.6}}>{p.it}</div>;
+  const headIt=p=>allIt&&<div style={{fontSize:12,color:light?"#2e7d32":"#a5d6a7",fontStyle:"italic",fontWeight:400,letterSpacing:0,textTransform:"none"}}>{p.it}</div>;
+
+  function choose(qi,oi){
+    if(answers[qi]!==undefined) return;
+    playSound(oi===qs[qi].a);
+    const na={...answers,[qi]:oi};
+    setAnswers(na);
+    if(Object.keys(na).length===qs.length){
+      const score=qs.filter((q,i)=>na[i]===q.a).length;
+      setResult({score,gain:onFinish(score,qs.length)});
+    }
+  }
+
+  let body;
+  if(r.format==="chat"){
+    body=(
+      <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
+        {r.paras.map((p,i)=>{
+          const me=p.who==="Marika";
+          return(
+            <div key={i} style={{display:"flex",justifyContent:me?"flex-end":"flex-start"}}>
+              <div style={{maxWidth:"86%",background:me?"linear-gradient(135deg,#1565c0,#1e88e5)":"rgba(255,255,255,0.09)",border:me?"1px solid transparent":"1px solid rgba(255,255,255,0.14)",borderRadius:me?"18px 4px 18px 18px":"4px 18px 18px 18px",padding:"10px 14px"}}>
+                <div style={{fontSize:11,fontWeight:700,color:me?"#bbdefb":"#ce93d8",marginBottom:4}}>{p.who}</div>
+                <div style={{fontSize:15,lineHeight:1.6}}>{words(p.en)}</div>
+                {itText(p,i)}{tools(i,p.en)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }else if(r.format==="menu"){
+    body=(
+      <div style={S.card({background:"linear-gradient(180deg,#1a1a2e,#16213e)",borderColor:"#ffd54f44",fontFamily:"Georgia,serif",padding:"24px 18px"})}>
+        <div style={{textAlign:"center",marginBottom:6}}>
+          <div style={{color:"#ffd54f",fontSize:24}}>🌙 {r.head.name}</div>
+          <div style={{...S.muted,fontStyle:"italic"}}>{r.head.place}</div>
+        </div>
+        {r.paras.map((p,i)=>p.h
+          ?<div key={i} style={{textAlign:"center",color:"#ffd54f",fontSize:14,letterSpacing:3,textTransform:"uppercase",margin:"22px 0 12px"}}>— {words(p.en)} —{headIt(p)}</div>
+          :<div key={i} style={{marginBottom:16}}>
+            <div style={{display:"flex",gap:10,alignItems:"baseline"}}>
+              <div style={{flex:1,fontSize:15,lineHeight:1.6}}>{p.name&&<b style={{color:"#fff8e1"}}>{words(p.name)} · </b>}{words(p.en)}</div>
+              {p.price&&<div style={{color:"#ffd54f",fontWeight:700,flexShrink:0}}>{p.price}</div>}
+            </div>
+            {itText(p,i)}{tools(i,say(p))}
+          </div>)}
+      </div>
+    );
+  }else if(r.format==="email"){
+    body=(
+      <div style={S.card({padding:0,overflow:"hidden"})}>
+        <div style={{background:"rgba(255,255,255,0.06)",padding:"12px 16px",borderBottom:"1px solid rgba(255,255,255,0.1)",fontSize:13,lineHeight:1.9}}>
+          <div><span style={S.muted}>From (Da):</span> {r.head.from}</div>
+          <div><span style={S.muted}>To (A):</span> {r.head.to}</div>
+          <div><span style={S.muted}>Subject (Oggetto):</span> <b>{words(r.head.subject)}</b></div>
+          {allIt&&<div style={{fontSize:12,color:"#a5d6a7",fontStyle:"italic"}}>{r.head.subjectIt}</div>}
+        </div>
+        <div style={{padding:16}}>
+          {r.paras.map((p,i)=>(
+            <div key={i} style={{marginBottom:14}}>
+              <div style={{fontSize:15,lineHeight:1.8}}>{words(p.en)}</div>
+              {itText(p,i)}{tools(i,p.en)}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }else if(r.format==="postcard"){
+    body=(
+      <div style={{background:"linear-gradient(135deg,#fffaf0,#f5e6c8)",color:"#3e2723",borderRadius:12,padding:"20px 18px",marginBottom:16,boxShadow:"0 8px 30px rgba(0,0,0,0.4)",fontFamily:"Georgia,serif",position:"relative"}}>
+        <div style={{position:"absolute",top:14,right:14,width:54,height:62,border:"2px dashed #b8860b",borderRadius:4,display:"flex",alignItems:"center",justifyContent:"center",fontSize:30,background:"#fff"}}>{r.head.stamp}</div>
+        <div style={{fontSize:11,letterSpacing:2,color:"#8d6e63",textTransform:"uppercase",marginBottom:16,paddingRight:70,minHeight:40}}>📍 {r.head.place}</div>
+        {r.paras.map((p,i)=>(
+          <div key={i} style={{marginBottom:14}}>
+            <div style={{fontSize:15,lineHeight:1.8,fontStyle:"italic"}}>{words(p.en)}</div>
+            {itText(p,i)}{tools(i,p.en)}
+          </div>
+        ))}
+        <div style={{borderTop:"1px solid #d7ccc8",marginTop:8,paddingTop:8,fontSize:12,color:"#8d6e63"}}>To: {r.head.to}</div>
+      </div>
+    );
+  }else{
+    body=(
+      <div style={S.card({padding:"20px 18px"})}>
+        {r.paras.map((p,i)=>p.h
+          ?<div key={i} style={{fontWeight:800,color:"#ffd54f",fontSize:14,letterSpacing:0.5,marginBottom:14}}>{words(p.en)}{headIt(p)}</div>
+          :<div key={i} style={{marginBottom:18}}>
+            <div style={{fontSize:16,lineHeight:1.85}}>{words(p.en)}</div>
+            {itText(p,i)}{tools(i,p.en)}
+          </div>)}
+      </div>
+    );
+  }
+
+  const ctl=on=>S.soft(on?{fontSize:13,padding:"8px 12px",background:"rgba(255,213,79,0.18)",border:"1px solid #ffd54f88"}:{fontSize:13,padding:"8px 12px"});
+  const answered=Object.keys(answers).length;
+  return(
+    <>
+      <button style={{...S.back,marginTop:16}} onClick={()=>{stopSpeaking();onBack();}}>← Letture</button>
+      <div style={S.center}>
+        <div style={{fontSize:48,marginBottom:4}}>{r.emoji}</div>
+        <div style={{...S.gtxt,fontSize:24}}>{r.titleEn}</div>
+        <div style={{color:"#90caf9",fontStyle:"italic",fontSize:14,marginTop:2}}>{r.title}</div>
+        <div style={{display:"flex",gap:6,justifyContent:"center",marginTop:10,flexWrap:"wrap"}}>
+          <Badge col={LEVEL_COL[r.level]}>{r.level} · {LEVEL_LBL[r.level]}</Badge>
+          <Badge>{r.type}</Badge>
+          <Badge>⏱ {readingMinutes(r)} min</Badge>
+        </div>
+        <div style={{...S.muted,marginTop:10,lineHeight:1.6}}>{r.intro}</div>
+      </div>
+
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"center",margin:"14px 0 8px"}}>
+        <button style={ctl(false)} onClick={()=>speakAll(r.paras.filter(p=>!p.h).map(say),rate)}>▶️ Ascolta tutto</button>
+        <button style={ctl(false)} onClick={stopSpeaking}>⏹ Stop</button>
+        <button style={ctl(slow)} onClick={()=>setSlow(s=>!s)}>🐢 Lento</button>
+        <button style={ctl(allIt)} onClick={()=>setAllIt(a=>!a)}>🇮🇹 {allIt?"Nascondi":"Traduci tutto"}</button>
+      </div>
+      <div style={{...S.center,...S.muted,fontSize:12,marginBottom:14,lineHeight:1.6}}>
+        👆 Tocca una parola <span style={{borderBottom:"2px dotted #ffd54f",color:"#fff"}}>sottolineata</span> per la traduzione · qualsiasi parola per sentirla
+      </div>
+
+      {body}
+
+      {r.phrases&&<div style={S.card({background:"rgba(255,255,255,0.04)"})}>
+        <div style={{fontSize:13,fontWeight:800,color:"#ffd54f",marginBottom:8}}>💬 Espressioni utili</div>
+        {r.phrases.map((ph,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderTop:i?"1px solid rgba(255,255,255,0.06)":"none"}}>
+            <button onClick={()=>speak(ph.en,rate)} style={{...S.spk,margin:0,padding:"4px 10px",flexShrink:0}}>🔊</button>
+            <div><div style={{fontWeight:700,fontSize:14}}>{ph.en}</div><div style={{color:"#a5d6a7",fontSize:12}}>{ph.it}</div></div>
+          </div>
+        ))}
+      </div>}
+
+      <div style={S.card({background:"linear-gradient(135deg,#1a237e55,#3949ab33)",borderColor:"#7986cb55"})}>
+        <div style={{fontSize:15,fontWeight:800,marginBottom:4}}>📝 Hai capito? · {answered}/{qs.length}</div>
+        <div style={{...S.muted,fontSize:12,marginBottom:14}}>Rispondi in base al testo. {best!==undefined?`Il tuo record: ${best}/${qs.length}`:"Completa la lettura per guadagnare XP!"}</div>
+        {qs.map((q,qi)=>{
+          const sel=answers[qi],done=sel!==undefined;
+          return(
+            <div key={qi} style={{marginBottom:16}}>
+              <div style={{fontWeight:700,fontSize:15,lineHeight:1.5}}>{qi+1}. {q.q}</div>
+              <div style={{...S.muted,fontSize:12,fontStyle:"italic",marginBottom:8}}>{q.qIt}</div>
+              <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                {q.order.map(oi=>{
+                  let bg="rgba(255,255,255,0.06)",bd="rgba(255,255,255,0.14)",mark="";
+                  if(done){
+                    if(oi===q.a){bg="rgba(76,175,80,0.25)";bd="#4caf50";mark="✅ ";}
+                    else if(oi===sel){bg="rgba(244,67,54,0.25)";bd="#f44336";mark="❌ ";}
+                  }
+                  return <button key={oi} onClick={()=>choose(qi,oi)} style={{background:bg,border:`2px solid ${bd}`,borderRadius:12,padding:"10px 14px",color:"#fff",fontSize:14,textAlign:"left",cursor:done?"default":"pointer"}}>{mark}{q.opts[oi]}</button>;
+                })}
+              </div>
+            </div>
+          );
+        })}
+        {result&&<div style={{...S.center,padding:"16px 8px 4px",borderTop:"1px solid rgba(255,255,255,0.12)",animation:"fadeIn 0.4s ease"}}>
+          <div style={{fontSize:44}}>{result.score===qs.length?"🏆":result.score>=qs.length/2?"🌟":"💪"}</div>
+          <div style={{...S.gtxt,fontSize:22}}>{result.score}/{qs.length} risposte giuste!</div>
+          <div style={{color:"#ffd54f",fontSize:15,margin:"6px 0 14px"}}>{result.gain>0?`+${result.gain} XP guadagnati!`:"Nessun XP extra: hai già fatto questo punteggio 😉"}</div>
+          <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
+            <button style={S.soft()} onClick={()=>{setAnswers({});setResult(null);}}>🔄 Riprova</button>
+            {onNext
+              ?<button style={S.btn()} onClick={()=>{stopSpeaking();onNext();}}>Prossima lettura →</button>
+              :<button style={S.btn()} onClick={()=>{stopSpeaking();onBack();}}>📚 Tutte le letture</button>}
+          </div>
+        </div>}
+      </div>
+
+      {sheet&&<div onClick={()=>setSheet(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:9000,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+        <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:500,background:"linear-gradient(160deg,#1a1a4e,#0d2b6b)",borderRadius:"24px 24px 0 0",border:"1px solid rgba(255,255,255,0.15)",padding:"22px 20px calc(24px + env(safe-area-inset-bottom))",textAlign:"center",animation:"fadeIn 0.2s ease"}}>
+          <div style={{fontSize:26,fontWeight:800}}>{sheet.en}</div>
+          <button onClick={()=>speak(sheet.en,rate)} style={S.spk}>🔊 Ascolta</button>
+          <div style={{fontSize:18,color:"#a5d6a7",fontWeight:700,margin:"10px 0 18px",lineHeight:1.5}}>{sheet.it}</div>
+          <div style={{display:"flex",gap:10,justifyContent:"center",alignItems:"center"}}>
+            {kit.learned.has(sheet.en)
+              ?<div style={{color:"#a5d6a7",fontSize:13,padding:10}}>✅ Già imparata</div>
+              :<button style={S.btn()} onClick={()=>{kit.learnWord(sheet.en);setSheet(null);}}>⭐ La so! +5 XP</button>}
+            <button style={S.soft()} onClick={()=>setSheet(null)}>Chiudi</button>
+          </div>
+        </div>
+      </div>}
+    </>
+  );
+}
+
 // ── APP ───────────────────────────────────────────────────────────────────────
 function App(){
   // ── Persistent state ──────────────────────────────────────────
@@ -428,16 +1414,26 @@ function App(){
   const[welcomed,setWelcomed]=useState(()=>LS('llm_welcomed','')!=='');
   const[notifEnabled,setNotifEnabled]=useState(()=>LS('llm_notif','')==='1'&&typeof Notification!=='undefined'&&Notification.permission==='granted');
   const[dailyDone,setDailyDone]=useState(()=>{try{const d=JSON.parse(LS('llm_daily','{}'));return d.date===todayStr()&&d.done;}catch{return false;}});
+  const[gamesPlayed,setGamesPlayed]=useState(()=>{try{return new Set(JSON.parse(LS('llm_games','[]')));}catch{return new Set();}});
+  const[gameBest,setGameBest]=useState(()=>{try{return JSON.parse(LS('llm_gbest','{}'));}catch{return{};}});
+  const[readDone,setReadDone]=useState(()=>{try{return JSON.parse(LS('llm_readings','{}'));}catch{return{};}}); // id → miglior punteggio
 
   useEffect(()=>{try{localStorage.setItem('llm_xp',xp);}catch{}},[xp]);
   useEffect(()=>{try{localStorage.setItem('llm_learned',JSON.stringify([...learned]));}catch{}},[learned]);
   useEffect(()=>{try{localStorage.setItem('llm_ach',JSON.stringify([...achievements]));}catch{}},[achievements]);
   useEffect(()=>{try{localStorage.setItem('llm_dialogues',JSON.stringify([...completedDialogues]));}catch{}},[completedDialogues]);
+  useEffect(()=>{try{localStorage.setItem('llm_games',JSON.stringify([...gamesPlayed]));}catch{}},[gamesPlayed]);
+  useEffect(()=>{try{localStorage.setItem('llm_gbest',JSON.stringify(gameBest));}catch{}},[gameBest]);
+  useEffect(()=>{try{localStorage.setItem('llm_readings',JSON.stringify(readDone));}catch{}},[readDone]);
 
   // ── UI state ─────────────────────────────────────────────────
   const[screen,setScreen]=useState('home');
   const[welcomeStep,setWelcomeStep]=useState(0);
   const[newAch,setNewAch]=useState(null);
+  const[achQueue,setAchQueue]=useState([]);
+  const[gameId,setGameId]=useState(null);
+  const[readingI,setReadingI]=useState(0);
+  const[readLevel,setReadLevel]=useState('all');
   const[showFlash,setShowFlash]=useState(false);
   const[showReset,setShowReset]=useState(false);
 
@@ -495,13 +1491,28 @@ function App(){
     }
   },[]);
 
+  // Badge in coda: se se ne sbloccano due insieme, si vedono uno dopo l'altro
+  useEffect(()=>{
+    if(newAch||!achQueue.length) return;
+    const t=setTimeout(()=>{setNewAch(achQueue[0]);setAchQueue(q=>q.slice(1));},200);
+    return()=>clearTimeout(t);
+  },[newAch,achQueue]);
+  useEffect(()=>{
+    if(!newAch) return;
+    const t=setTimeout(()=>setNewAch(null),3200);
+    return()=>clearTimeout(t);
+  },[newAch]);
+
+  // Ogni nuova schermata parte dall'alto
+  useEffect(()=>{try{window.scrollTo(0,0);}catch{}},[screen,readingI,gameId]);
+
   // ── Functions ────────────────────────────────────────────────
   function unlockAch(id){
     setAchievements(prev=>{
       if(prev.has(id)) return prev;
       const a=ACHIEVEMENTS.find(x=>x.id===id);
       if(!a) return prev;
-      setTimeout(()=>{setNewAch(a);setTimeout(()=>setNewAch(null),3200);},200);
+      setAchQueue(q=>[...q,a]);
       return new Set([...prev,id]);
     });
   }
@@ -550,30 +1561,39 @@ function App(){
     },200);
   }
 
-  function speak(text){
-    if(!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.lang='en-US';u.rate=0.82;window.speechSynthesis.speak(u);
+  // I giochi danno XP da soli; qui si salvano record e partite giocate.
+  function finishGame(id,score){
+    const g=GAMES.find(x=>x.id===id);
+    setGameBest(prev=>{
+      const old=prev[id];
+      const better=old===undefined||(g&&g.lower?score<old:score>old);
+      return better?{...prev,[id]:score}:prev;
+    });
+    markStudied();
+    if(!gamesPlayed.has(id)){
+      const ns=new Set([...gamesPlayed,id]);
+      setGamesPlayed(ns);
+      setTimeout(()=>{
+        if(ns.size===1) unlockAch('first_game');
+        if(ns.size===GAMES.length) unlockAch('all_games');
+      },300);
+    }
   }
 
-  function playSound(ok){
-    try{
-      const ctx=new(window.AudioContext||window.webkitAudioContext)();
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);
-      if(ok){
-        o.type='sine';o.frequency.value=523;
-        g.gain.setValueAtTime(0.18,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
-        o.start();o.stop(ctx.currentTime+0.5);
-      }else{
-        o.type='square';o.frequency.value=160;
-        g.gain.setValueAtTime(0.1,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.22);
-        o.start();o.stop(ctx.currentTime+0.22);
-      }
-    }catch{}
+  // Lettura: +20 XP la prima volta, +5 XP per ogni risposta giusta oltre il record.
+  function finishReading(id,score,total){
+    const prev=readDone[id],first=prev===undefined;
+    const gain=(first?20:0)+5*Math.max(0,score-(first?0:prev));
+    if(gain) addXP(gain);
+    markStudied();
+    const nd={...readDone,[id]:first?score:Math.max(prev,score)};
+    setReadDone(nd);
+    setTimeout(()=>{
+      unlockAch('first_reading');
+      if(score===total) unlockAch('perfect_reading');
+      if(READINGS.every(r=>nd[r.id]!==undefined)) unlockAch('all_readings');
+    },300);
+    return gain;
   }
 
   /* ──────────────────────────────────────────────────────────────────
@@ -691,8 +1711,9 @@ function App(){
   }
 
   function resetProgress(){
-    ['llm_xp','llm_learned','llm_streak','llm_lastStudy','llm_ach','llm_daily','llm_dialogues'].forEach(k=>{try{localStorage.removeItem(k);}catch{}});
+    ['llm_xp','llm_learned','llm_streak','llm_lastStudy','llm_ach','llm_daily','llm_dialogues','llm_games','llm_gbest','llm_readings'].forEach(k=>{try{localStorage.removeItem(k);}catch{}});
     setXp(0);setLearned(new Set());setStreak(0);setLastStudy('');setAchievements(new Set());setCompletedDialogues(new Set());setDailyDone(false);setShowReset(false);
+    setGamesPlayed(new Set());setGameBest({});setReadDone({});
   }
 
   async function enableNotifications(){
@@ -720,12 +1741,15 @@ function App(){
   const rDone=rW.filter(w=>learned.has(w)).length;
   const fDone=fW.filter(w=>learned.has(w)).length;
   const tDone=tW.filter(w=>learned.has(w)).length;
+  const readN=READINGS.filter(r=>readDone[r.id]!==undefined).length;
+  const kit={addXP,markStudied,learnWord,unlockAch,learned};
 
   // ── WELCOME ───────────────────────────────────────────────────
   if(!welcomed){
     const slides=[
       {e:"🌙",t:"Ciao Marika! 👋",s:"Questa app è stata creata apposta per te 💙",b:"Impara l'inglese con le cose che ami di più — cucina, moda, viaggi, Bridgerton e i tuoi attori preferiti!"},
       {e:"🍝👗✈️",t:"Tutto quello che ami",s:"Ricette · Moda · Viaggi · Bridgerton · Can Yaman · Dialoghi",b:"Ogni sezione ha parole pensate per te. Premi 🔊 su ogni parola per sentire come si pronuncia in inglese!"},
+      {e:"🎲📖",t:"Gioca e leggi!",s:`${GAMES.length} giochi di parole · ${READINGS.length} letture con domande`,b:"Memory, anagrammi, dettato e sfide a tempo per allenarti giocando. E poi storie, email, menù e cartoline da leggere: tocca una parola per scoprire cosa vuol dire!"},
       {e:"💬🌹♐",t:"Impara veri dialoghi!",s:"8 dialoghi pratici · Bridgerton style · Sagittario ♐",b:"Hai detto che vuoi imparare a fare un dialogo in inglese — abbiamo creato una sezione apposta per te! All'aeroporto, in boutique, al ristorante e molto altro."},
       {e:"🔥🌕🏆",t:"Fai crescere la tua luna!",s:"Streak · Livelli · Badge · Sfida del Giorno",b:"Guadagna XP studiando, mantieni la serie 🔥 tornando ogni giorno e sblocca tutti i badge. Pronta a partire?"},
     ];
@@ -829,7 +1853,9 @@ function App(){
 
       {/* Section Cards with progress */}
       {[
-        {id:"dialogues",icon:"💬",label:"Dialoghi in Inglese",sub:`${completedDialogues.size}/${DIALOGUES.length} dialoghi · La tua sezione preferita!`,done:completedDialogues.size,total:DIALOGUES.length,col:"#1976d2",highlight:true},
+        {id:"dialogues",icon:"💬",label:"Dialoghi in Inglese",sub:`${completedDialogues.size}/${DIALOGUES.length} dialoghi · La tua sezione preferita!`,done:completedDialogues.size,total:DIALOGUES.length,col:"#1976d2"},
+        {id:"games",icon:"🎲",label:"Giochi di Parole",sub:`${GAMES.length} giochi · memory, anagrammi, dettato, sfida lampo`,done:gamesPlayed.size,total:GAMES.length,col:"#00838f",highlight:true},
+        {id:"readings",icon:"📖",label:"Letture in Inglese",sub:`${readN}/${READINGS.length} letture · storie, email, menù, cartoline`,done:readN,total:READINGS.length,col:"#4527a0",highlight:true},
         {id:"recipe",icon:"🍝",label:"Cucina & Ricette",sub:"10 ricette italiane · consigli da chef",done:rDone,total:rW.length,col:"#c62828"},
         {id:"zodiac",icon:"⭐",label:"Astrologia in Inglese",sub:"12 segni · Sagittario ♐ approfondito",done:null,col:"#6a1b9a"},
         {id:"facts",icon:"✈️",label:"Fun Facts & Vocaboli",sub:"21 temi · viaggi, moda, attori, musica",done:fDone,total:fW.length,col:"#01579b"},
@@ -908,6 +1934,102 @@ function App(){
       </div>
     </div></div>
   );
+
+  // ── GIOCHI ────────────────────────────────────────────────────
+  if(screen==="games") return(
+    <div style={S.app}><div style={S.wrap}>
+      <button style={{...S.back,marginTop:16}} onClick={()=>setScreen("home")}>← Home</button>
+      <div style={{...S.center,padding:"4px 0 20px"}}>
+        <div style={{fontSize:44}}>🎲</div>
+        <div style={S.gtxt}>Giochi di Parole</div>
+        <div style={{...S.muted,marginTop:4}}>Impara giocando · {gamesPlayed.size}/{GAMES.length} giochi provati</div>
+      </div>
+      {GAMES.map(g=>{
+        const b=gameBest[g.id];
+        return(
+          <div key={g.id} onClick={()=>{setGameId(g.id);setScreen("game");}}
+            style={S.card({background:`linear-gradient(135deg,${g.col}55,${g.col}22)`,borderColor:`${g.col}60`,display:"flex",alignItems:"center",gap:16,cursor:"pointer"})}>
+            <div style={{fontSize:34,flexShrink:0}}>{g.icon}</div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:15}}>{g.label}{gamesPlayed.has(g.id)&&<span style={{marginLeft:6,fontSize:12,color:"#a5d6a7"}}>✓</span>}</div>
+              <div style={S.muted}>{g.sub}</div>
+              {b!==undefined&&<div style={{color:"#ffd54f",fontSize:12,marginTop:4}}>{g.fmt(b)}</div>}
+            </div>
+            <div style={{color:"#b3c5d7",fontSize:20}}>›</div>
+          </div>
+        );
+      })}
+      <div onClick={()=>setScreen("quizPick")} style={S.card({background:"rgba(255,255,255,0.04)",display:"flex",alignItems:"center",gap:16,cursor:"pointer"})}>
+        <div style={{fontSize:28}}>🎮</div>
+        <div style={{flex:1}}><div style={{fontWeight:700,fontSize:14}}>Quiz classici</div><div style={S.muted}>Normale · Inverso · Sfida del Giorno</div></div>
+        <div style={{color:"#b3c5d7",fontSize:20}}>›</div>
+      </div>
+    </div>{overlays}</div>
+  );
+
+  if(screen==="game"&&GAME_VIEWS[gameId]){
+    const G=GAME_VIEWS[gameId];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <G kit={kit} best={gameBest[gameId]} onExit={()=>setScreen("games")} onFinish={sc=>finishGame(gameId,sc)}/>
+      </div>{overlays}</div>
+    );
+  }
+
+  // ── LETTURE ───────────────────────────────────────────────────
+  if(screen==="readings"){
+    const list=READINGS.map((r,i)=>({r,i})).filter(({r})=>readLevel==="all"||r.level===readLevel);
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <button style={{...S.back,marginTop:16}} onClick={()=>setScreen("home")}>← Home</button>
+        <div style={{...S.center,padding:"4px 0 16px"}}>
+          <div style={{fontSize:44}}>📖</div>
+          <div style={S.gtxt}>Letture in Inglese</div>
+          <div style={{...S.muted,marginTop:4}}>{readN}/{READINGS.length} lette · tocca le parole per tradurle!</div>
+          <div style={{...S.bar,width:"80%",margin:"10px auto 0"}}><div style={S.fill(readN/READINGS.length*100)}/></div>
+        </div>
+        <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:16,flexWrap:"wrap"}}>
+          {["all","A1","A2","B1"].map(l=>(
+            <button key={l} onClick={()=>setReadLevel(l)}
+              style={{background:readLevel===l?"linear-gradient(135deg,#1976d2,#42a5f5)":"rgba(255,255,255,0.06)",border:`1px solid ${readLevel===l?"#42a5f5":"rgba(255,255,255,0.12)"}`,borderRadius:14,padding:"7px 14px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>
+              {l==="all"?"Tutti":`${l} · ${LEVEL_LBL[l]}`}
+            </button>
+          ))}
+        </div>
+        {list.map(({r,i})=>{
+          const b=readDone[r.id],isDone=b!==undefined;
+          return(
+            <div key={r.id} onClick={()=>{setReadingI(i);setScreen("reading");}}
+              style={S.card({display:"flex",alignItems:"center",gap:14,cursor:"pointer",background:isDone?"linear-gradient(135deg,#1b5e2033,#4caf5014)":"rgba(255,255,255,0.06)",borderColor:isDone?"#4caf5055":"rgba(255,255,255,0.12)"})}>
+              <div style={{fontSize:34,flexShrink:0}}>{r.emoji}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:700,fontSize:15}}>{r.titleEn}</div>
+                <div style={{...S.muted,fontSize:12,marginBottom:6}}>{r.title}</div>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  <Badge col={LEVEL_COL[r.level]}>{r.level}</Badge><Badge>{r.type}</Badge><Badge>⏱ {readingMinutes(r)} min</Badge>
+                </div>
+              </div>
+              <div style={{textAlign:"right",flexShrink:0}}>
+                {isDone?<><div style={{fontSize:18}}>✅</div><div style={{...S.muted,fontSize:11}}>{b}/{r.quiz.length}</div></>:<div style={{color:"#b3c5d7",fontSize:20}}>›</div>}
+              </div>
+            </div>
+          );
+        })}
+      </div>{overlays}</div>
+    );
+  }
+
+  if(screen==="reading"){
+    const r=READINGS[readingI];
+    return(
+      <div style={S.app}><div style={S.wrap}>
+        <ReadingView key={r.id} r={r} kit={kit} best={readDone[r.id]}
+          onBack={()=>setScreen("readings")}
+          onFinish={(sc,tot)=>finishReading(r.id,sc,tot)}
+          onNext={readingI<READINGS.length-1?()=>setReadingI(i=>i+1):null}/>
+      </div>{overlays}</div>
+    );
+  }
 
   // ── ACHIEVEMENTS ──────────────────────────────────────────────
   if(screen==="achievements") return(
